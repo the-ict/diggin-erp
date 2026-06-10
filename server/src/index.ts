@@ -10,6 +10,9 @@ import morgan from "morgan";
 // configure dotenv
 dotenv.config();
 
+// routes import
+import workerRoutes from "./routers/worker.routes.js";
+
 // initialize express
 const app = express();
 
@@ -24,6 +27,8 @@ app.use(cors({
 app.get("/", (req: Request, res: Response) => {
     res.send("Working !");
 });
+
+app.use("/api/workers", workerRoutes);
 
 // error handler
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
