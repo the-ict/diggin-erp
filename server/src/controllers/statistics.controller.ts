@@ -7,6 +7,23 @@ import { WareItem } from "../models/wareitem.model.js";
 import { TeamModel } from "../models/team.model.js";
 import { Well } from "../models/well.model.js";
 
+export const wellsByMonth = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const {month, year} = req.body;
+
+        const wells = await Well.find({
+            createdAt: {
+                $gte: new Date(year, month - 1, 1),
+                $lt: new Date(year, month, 1)
+            }
+        });
+        
+        res.json({ success: true, data: wells });
+    } catch (error) {
+        next(error);
+    }
+};
+
 export const workersByMonth = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const {month, year} = req.body;
@@ -137,7 +154,7 @@ export const totalTeams12Month = async (req: Request, res: Response, next: NextF
     }
 };
 
-export const wells12Month = async (req: Request, res: Response, next: NextFunction) => {
+export const totalWells12Month = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const wells = await Well.find({
             createdAt: {
@@ -151,3 +168,4 @@ export const wells12Month = async (req: Request, res: Response, next: NextFuncti
         next(error);
     }
 };
+

@@ -17,7 +17,7 @@ const wellSchema = new mongoose.Schema<IWell>({
     status: {
         type: String,
         required: true
-    }
+    },
 });
 
 export const Well = mongoose.model<IWell>("Well", wellSchema);
