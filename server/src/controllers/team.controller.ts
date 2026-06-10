@@ -1,6 +1,7 @@
 import { TeamModel } from "../models/team.model.js";
 import { WorkerModel } from "../models/worker.model.js";
 import { MachineModel } from "../models/machine.model.js";
+import { Well } from "../models/well.model.js";
 import type { Request, Response, NextFunction } from "express";
 
 export const createTeam = async (req: Request, res: Response, next: NextFunction) => {
@@ -17,6 +18,12 @@ export const createTeam = async (req: Request, res: Response, next: NextFunction
                 await MachineModel.findByIdAndUpdate(team.machine, {
                     teamId: team._id
                 });
+            }
+            if (team.wells && team.wells.length > 0) {
+                await Well.updateMany(
+                    { _id: { $in: team.wells } },
+                    { team: team._id }
+                );
             }
         }
         res.status(201).json({ success: true, data: team });
@@ -94,6 +101,24 @@ export const updateTeam = async (req: Request, res: Response, next: NextFunction
             });
         }
         
+        // Handle wells change
+        if (req.body.wells) {
+            // Remove from old wells
+            if (oldTeam.wells && oldTeam.wells.length > 0) {
+                await Well.updateMany(
+                    { _id: { $in: oldTeam.wells } },
+                    { team: null }
+                );
+            }
+            // Add to new wells
+            if (req.body.wells.length > 0) {
+                await Well.updateMany(
+                    { _id: { $in: req.body.wells } },
+                    { team: id }
+                );
+            }
+        }
+        
         res.json({ success: true, data: team });
     } catch (error) {
         next(error);
@@ -122,6 +147,13 @@ export const deleteTeam = async (req: Request, res: Response, next: NextFunction
             await MachineModel.findByIdAndUpdate(team.machine, {
                 teamId: null
             });
+        }
+        // Remove from wells
+        if (team.wells && team.wells.length > 0) {
+            await Well.updateMany(
+                { _id: { $in: team.wells } },
+                { team: null }
+            );
         }
         res.json({ success: true, data: team });
     } catch (error) {

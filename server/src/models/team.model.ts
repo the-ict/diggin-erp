@@ -12,7 +12,11 @@ const teamSchema = new mongoose.Schema<ITeamModel>({
         type: String,
         required: true,
         trim: true,
-    }
+    },
+    wells: [{
+        type: String,
+        required: false,
+    }]
 });
 
 export const TeamModel = mongoose.model("Team", teamSchema);
