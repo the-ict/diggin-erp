@@ -1,9 +1,24 @@
 import { WareTransaction } from "../models/waretransaction.model.js";
+import { WareItem } from "../models/wareitem.model.js";
 import type { Request, Response, NextFunction } from "express";
 
 export const createWareTransaction = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const wareTransaction = await WareTransaction.create(req.body);
+        
+        if (wareTransaction.wareItemId) {
+            const item = await WareItem.findById(wareTransaction.wareItemId);
+            if (item) {
+                if (wareTransaction.type === "INCOME") {
+                    item.quantity += wareTransaction.quantity;
+                } else if (wareTransaction.type === "OUTCOME") {
+                    item.quantity -= wareTransaction.quantity;
+                    if (item.quantity < 0) item.quantity = 0;
+                };
+                await item.save();
+            }
+        }
+        
         res.status(201).json({ success: true, data: wareTransaction });
     } catch (error) {
         next(error);

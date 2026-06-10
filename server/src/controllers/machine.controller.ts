@@ -1,9 +1,15 @@
 import { MachineModel } from "../models/machine.model.js";
 import type { Request, Response, NextFunction } from "express";
+import { TeamModel } from "../models/team.model.js";
 
 export const createMachine = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const machine = await MachineModel.create(req.body);
+        if(machine._id && machine.teamId) {
+            await TeamModel.findByIdAndUpdate(machine.teamId, {
+                $set: { machine: machine._id }
+            })
+        };
         res.status(201).json({ success: true, data: machine });
     } catch (error) {
         next(error);
@@ -41,10 +47,26 @@ export const updateMachine = async (req: Request, res: Response, next: NextFunct
         if (!id) {
             return res.status(400).json({ success: false, error: "ID is required" });
         }
-        const machine = await MachineModel.findByIdAndUpdate(id, req.body, { new: true });
-        if (!machine) {
+        const oldMachine = await MachineModel.findById(id);
+        if (!oldMachine) {
             return res.status(404).json({ success: false, error: "Machine not found" });
         }
+        const machine = await MachineModel.findByIdAndUpdate(id, req.body, { new: true });
+        
+        // Handle team change
+        if (req.body.teamId && req.body.teamId !== oldMachine.teamId) {
+            // Remove from old team
+            if (oldMachine.teamId) {
+                await TeamModel.findByIdAndUpdate(oldMachine.teamId, {
+                    $set: { machine: null }
+                });
+            }
+            // Add to new team
+            await TeamModel.findByIdAndUpdate(req.body.teamId, {
+                $set: { machine: id }
+            });
+        }
+        
         res.json({ success: true, data: machine });
     } catch (error) {
         next(error);
@@ -60,6 +82,12 @@ export const deleteMachine = async (req: Request, res: Response, next: NextFunct
         const machine = await MachineModel.findByIdAndDelete(id);
         if (!machine) {
             return res.status(404).json({ success: false, error: "Machine not found" });
+        }
+        // Remove from team
+        if (machine.teamId) {
+            await TeamModel.findByIdAndUpdate(machine.teamId, {
+                $set: { machine: null }
+            });
         }
         res.json({ success: true, data: machine });
     } catch (error) {

@@ -7,6 +7,11 @@ const teamSchema = new mongoose.Schema<ITeamModel>({
         type: String,
         required: true,
         trim: true,
+    },
+    machine: {
+        type: String,
+        required: true,
+        trim: true,
     }
 });
 
