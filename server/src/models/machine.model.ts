@@ -12,6 +12,14 @@ const machineSchema = new mongoose.Schema<IMachineModel>({
         required: true,
         trim: true,
     },
+    wells: [{
+        type: String,
+    }],
+    status: {
+        type: String,
+        enum: ["ACTIVE", "REPAIRING"],
+        default: "ACTIVE",
+    },
 });
 
 export const MachineModel = mongoose.model("Machine", machineSchema);

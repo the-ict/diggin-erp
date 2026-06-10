@@ -1,10 +1,11 @@
 import express from "express";
 import type { NextFunction, Request, Response } from "express";
+import connection_db from "./config/db.js";
+import logger from "./utils/loggers.js";
 import helmet from "helmet";
 import dotenv from "dotenv";
 import cors from "cors";
 import morgan from "morgan";
-import logger from "./utils/loggers.js";
 
 // configure dotenv
 dotenv.config();
@@ -26,10 +27,17 @@ app.get("/", (req: Request, res: Response) => {
 
 // error handler
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
-    res.status(500).send("Something broke!");
+    const error_message = err.message || "Something went wrong";
+    const error_cause = err.cause;
+    res.status(500).json({
+        message: error_message,
+        cause: error_cause
+
+    });
 });
 
 // start server
-app.listen(3000, () => {
+app.listen(3000, async () => {
+    await connection_db();
     logger.info("Server is running on port 3000");
 });
