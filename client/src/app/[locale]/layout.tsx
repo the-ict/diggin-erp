@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import '../globals.css';
-import { golosText } from '@/shared/config/fonts';
+import { robotoText } from '@/shared/config/fonts';
 import { ThemeProvider } from '@/shared/config/theme-provider';
 import { PRODUCT_INFO } from '@/shared/constants/data';
 import { hasLocale, Locale, NextIntlClientProvider } from 'next-intl';
@@ -38,7 +38,7 @@ export default async function RootLayout({ children, params }: Props) {
 
   return (
     <html lang={locale} suppressHydrationWarning>
-      <body className={`${golosText.variable} antialiased`}>
+      <body className={`${robotoText.variable} antialiased`}>
         <NextIntlClientProvider locale={locale}>
           <ThemeProvider
             attribute={'class'}

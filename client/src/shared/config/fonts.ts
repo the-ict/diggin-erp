@@ -1,9 +1,10 @@
 import { Golos_Text } from 'next/font/google';
+import { Roboto } from 'next/font/google';
 
-const golosText = Golos_Text({
+const robotoText = Roboto({
   weight: ['400', '500', '600', '700', '800'],
-  variable: '--font-golos-text',
+  variable: '--font-roboto',
   subsets: ['latin', 'cyrillic'],
 });
 
-export { golosText };
+export { robotoText };
