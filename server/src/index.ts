@@ -27,7 +27,7 @@ const app = express();
 app.use(helmet());
 app.use(morgan("combined"));
 app.use(cors({
-    origin: "http://localhost:5000",
+    origin: ["http://localhost:5000", "http://localhost:3001"],
 }));
 
 // routes
