@@ -11,7 +11,14 @@ import morgan from "morgan";
 dotenv.config();
 
 // routes import
+import wareTransactionRoutes from "./routers/waretransaction.routes.js";
+import transactionRoutes from "./routers/transaction.routes.js";
+import wareItemRoutes from "./routers/wareitem.routes.js";
+import purchaseRoutes from "./routers/purchase.routes.js";
+import machineRoutes from "./routers/machine.routes.js";
 import workerRoutes from "./routers/worker.routes.js";
+import wellRoutes from "./routers/well.routes.js";
+import teamRoutes from "./routers/team.routes.js";
 
 // initialize express
 const app = express();
@@ -29,6 +36,13 @@ app.get("/", (req: Request, res: Response) => {
 });
 
 app.use("/api/workers", workerRoutes);
+app.use("/api/transactions", transactionRoutes);
+app.use("/api/machines", machineRoutes);
+app.use("/api/wells", wellRoutes);
+app.use("/api/ware-items", wareItemRoutes);
+app.use("/api/ware-transactions", wareTransactionRoutes);
+app.use("/api/purchases", purchaseRoutes);
+app.use("/api/teams", teamRoutes);
 
 // error handler
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
