@@ -48,7 +48,9 @@ export default async function RootLayout({ children, params }: Props) {
             disableTransitionOnChange
           >
             <QueryProvider>
+              <Navbar />
               {children}
+              <Footer />
             </QueryProvider>
           </ThemeProvider>
         </NextIntlClientProvider>
