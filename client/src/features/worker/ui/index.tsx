@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { Phone, Users, MoreVertical, Plus, X } from "lucide-react";
-import { useWorkers } from "@/shared/lib/hooks/use-workers";
+import { useWorkers, useCreateWorker } from "@/shared/lib/hooks/use-workers";
+import { useTeams } from "@/shared/lib/hooks/use-teams";
 import { StatusBadge } from "@/shared/ui/StatusBadge";
 import { SkeletonCard } from "@/shared/ui/SkeletonCard";
 import { EmptyState } from "@/shared/ui/EmptyState";
@@ -13,9 +14,11 @@ import { Input } from "@/shared/ui/input";
 
 export default function WorkerPage() {
   const { data: workers, isLoading } = useWorkers();
+  const { data: teams } = useTeams();
+  const createWorker = useCreateWorker();
   const [filterPosition, setFilterPosition] = useState<string>("ALL");
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [newWorker, setNewWorker] = useState({ name: "", phone: "", position: "WORKER" as WorkerPosition });
+  const [newWorker, setNewWorker] = useState({ name: "", phone: "", position: "WORKER" as WorkerPosition, teamId: "" });
 
   const filteredWorkers = workers?.filter(worker => 
     filterPosition === "ALL" || worker.position === filterPosition
@@ -23,10 +26,23 @@ export default function WorkerPage() {
 
   const positions: (WorkerPosition | "ALL")[] = ["ALL", "DRIVER", "OPERATOR", "WORKER", "SUPERVISOR", "MASTER"];
 
-  const handleAddWorker = () => {
-    console.log("Adding worker:", newWorker);
-    setIsAddModalOpen(false);
-    setNewWorker({ name: "", phone: "", position: "WORKER" });
+  const positionLabels: Record<WorkerPosition | "ALL", string> = {
+    "ALL": "Ҳаммаси",
+    "DRIVER": "Ҳайдовчи",
+    "OPERATOR": "Оператор",
+    "WORKER": "Ишчи",
+    "SUPERVISOR": "Назоратчи",
+    "MASTER": "Уста"
+  };
+
+  const handleAddWorker = async () => {
+    try {
+      await createWorker.mutateAsync(newWorker);
+      setIsAddModalOpen(false);
+      setNewWorker({ name: "", phone: "", position: "WORKER", teamId: "" });
+    } catch (error) {
+      console.error("Failed to add worker:", error);
+    }
   };
 
   if (isLoading) {
@@ -48,7 +64,7 @@ export default function WorkerPage() {
         <h1 className="text-2xl font-semibold tracking-tight text-gray-900">Ишчилар</h1>
         <Sheet open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
           <SheetTrigger asChild>
-            <button className="flex items-center gap-2 px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg transition-colors">
+            <button className="flex items-center gap-2 px-3 py-1.5 bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg transition-colors text-sm">
               <Plus className="w-4 h-4" />
               <span>Qo'shish</span>
             </button>
@@ -73,6 +89,19 @@ export default function WorkerPage() {
                   onChange={(e) => setNewWorker({ ...newWorker, phone: e.target.value })}
                   placeholder="+998 90 123 45 67"
                 />
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-700 mb-1 block">Жамоа</label>
+                <select
+                  value={newWorker.teamId}
+                  onChange={(e) => setNewWorker({ ...newWorker, teamId: e.target.value })}
+                  className="w-full h-8 rounded-lg border border-input bg-transparent px-2.5 py-1 text-sm transition-colors outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+                >
+                  <option value="">Жамоани танланг</option>
+                  {teams?.map(team => (
+                    <option key={team._id} value={team._id}>{team.name}</option>
+                  ))}
+                </select>
               </div>
               <div>
                 <label className="text-sm font-medium text-gray-700 mb-1 block">Лавозим</label>

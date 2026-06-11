@@ -23,7 +23,7 @@ import Link from 'next/link';
 
 const Navbar = () => {
   return (
-    <section className="py-4 border-b border-gray-200 bg-white">
+    <section className="py-4 bg-white">
       <div className="custom-container">
         <nav className="hidden justify-between lg:flex">
           <div className="flex items-center gap-6">

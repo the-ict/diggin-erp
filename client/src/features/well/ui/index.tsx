@@ -1,14 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { MapPin, Ruler, MoreVertical, Plus } from "lucide-react";
-import { useWells } from "@/shared/lib/hooks/use-wells";
+import {  MoreVertical, Plus } from "lucide-react";
+import { useWells, useCreateWell } from "@/shared/lib/hooks/use-wells";
 import { useTeams } from "@/shared/lib/hooks/use-teams";
 import { StatusBadge } from "@/shared/ui/StatusBadge";
 import { SkeletonCard } from "@/shared/ui/SkeletonCard";
 import { EmptyState } from "@/shared/ui/EmptyState";
 import { Well, WellStatus } from "@/shared/config/api/well.model";
-import { Team } from "@/shared/config/api/team.model";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/shared/ui/sheet";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
@@ -16,9 +15,10 @@ import { Input } from "@/shared/ui/input";
 export default function WellPage() {
   const { data: wells, isLoading } = useWells();
   const { data: teams } = useTeams();
+  const createWell = useCreateWell();
   const [filterStatus, setFilterStatus] = useState<string>("ALL");
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [newWell, setNewWell] = useState({ location: "", depth: "", status: "DUGGING" as WellStatus });
+  const [newWell, setNewWell] = useState({ team: "", length: 0, except_length: 0, status: "DUGGING" as WellStatus });
 
   const filteredWells = wells?.filter(well => 
     filterStatus === "ALL" || well.status === filterStatus
@@ -26,10 +26,22 @@ export default function WellPage() {
 
   const statuses: (WellStatus | "ALL")[] = ["ALL", "DUGGING", "FINISHED", "SUCCESSFUL", "FAILED"];
 
-  const handleAddWell = () => {
-    console.log("Adding well:", newWell);
-    setIsAddModalOpen(false);
-    setNewWell({ location: "", depth: "", status: "DUGGING" });
+  const statusLabels: Record<WellStatus | "ALL", string> = {
+    "ALL": "Ҳаммаси",
+    "DUGGING": "Қазилмоқда",
+    "FINISHED": "Тугалланган",
+    "SUCCESSFUL": "Мувваффақиятли",
+    "FAILED": "Мувваффақиятсиз"
+  };
+
+  const handleAddWell = async () => {
+    try {
+      await createWell.mutateAsync(newWell);
+      setIsAddModalOpen(false);
+      setNewWell({ team: "", length: 0, except_length: 0, status: "DUGGING" });
+    } catch (error) {
+      console.error("Failed to add well:", error);
+    }
   };
 
   if (isLoading) {
@@ -51,7 +63,7 @@ export default function WellPage() {
         <h1 className="text-2xl font-semibold tracking-tight text-gray-900">Қудуқлар</h1>
         <Sheet open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
           <SheetTrigger asChild>
-            <button className="flex items-center gap-2 px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg transition-colors">
+            <button className="flex items-center gap-2 px-3 py-1.5 bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg transition-colors text-sm">
               <Plus className="w-4 h-4" />
               <span>Qo'shish</span>
             </button>
@@ -62,19 +74,34 @@ export default function WellPage() {
             </SheetHeader>
             <div className="space-y-4 mt-4">
               <div>
-                <label className="text-sm font-medium text-gray-700 mb-1 block">Манзил</label>
+                <label className="text-sm font-medium text-gray-700 mb-1 block">Жамоа</label>
+                <select
+                  value={newWell.team}
+                  onChange={(e) => setNewWell({ ...newWell, team: e.target.value })}
+                  className="w-full h-8 rounded-lg border border-input bg-transparent px-2.5 py-1 text-sm transition-colors outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+                >
+                  <option value="">Жамоани танланг</option>
+                  {teams?.map(team => (
+                    <option key={team._id} value={team._id}>{team.name}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-700 mb-1 block">Узунлик (м)</label>
                 <Input
-                  value={newWell.location}
-                  onChange={(e) => setNewWell({ ...newWell, location: e.target.value })}
-                  placeholder="Қудуқ манзилини киритинг"
+                  value={newWell.length}
+                  onChange={(e) => setNewWell({ ...newWell, length: Number(e.target.value) })}
+                  placeholder="Узунликни киритинг"
+                  type="number"
                 />
               </div>
               <div>
-                <label className="text-sm font-medium text-gray-700 mb-1 block">Чуқурлик (м)</label>
+                <label className="text-sm font-medium text-gray-700 mb-1 block">Мустасно узунлик (м)</label>
                 <Input
-                  value={newWell.depth}
-                  onChange={(e) => setNewWell({ ...newWell, depth: e.target.value })}
-                  placeholder="Чуқурликни киритинг"
+                  value={newWell.except_length}
+                  onChange={(e) => setNewWell({ ...newWell, except_length: Number(e.target.value) })}
+                  placeholder="Мустасно узунликни киритинг"
+                  type="number"
                 />
               </div>
               <div>
@@ -110,7 +137,7 @@ export default function WellPage() {
                 : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"
             }`}
           >
-            {status}
+            {statusLabels[status]}
           </button>
         ))}
       </div>

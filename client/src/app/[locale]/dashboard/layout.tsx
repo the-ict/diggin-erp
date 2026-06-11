@@ -1,4 +1,3 @@
-import Sidebar from "@/widgets/sidebar/ui";
 import { ReactNode } from "react";
 
 type Props = {

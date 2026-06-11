@@ -38,7 +38,7 @@ export default async function RootLayout({ children, params }: Props) {
 
   return (
     <html lang={locale} className="light" suppressHydrationWarning>
-      <body className={`${robotoText.variable} antialiased`}>
+      <body className={`${robotoText.variable} antialiased ${robotoText.className}`}>
         <NextIntlClientProvider locale={locale}>
           <QueryProvider>
             <Navbar />

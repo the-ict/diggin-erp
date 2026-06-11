@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Users, Truck, MapPin, MoreVertical, Plus } from "lucide-react";
-import { useTeams } from "@/shared/lib/hooks/use-teams";
+import { useTeams, useCreateTeam } from "@/shared/lib/hooks/use-teams";
 import { useWorkers } from "@/shared/lib/hooks/use-workers";
 import { useMachines } from "@/shared/lib/hooks/use-machines";
 import { StatusBadge } from "@/shared/ui/StatusBadge";
@@ -19,13 +19,18 @@ export default function TeamPage() {
   const { data: teams, isLoading: teamsLoading } = useTeams();
   const { data: workers } = useWorkers();
   const { data: machines } = useMachines();
+  const createTeam = useCreateTeam();
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [newTeam, setNewTeam] = useState({ name: "" });
+  const [newTeam, setNewTeam] = useState({ name: "", workersIds: [] as string[], machine: "", wells: [] as string[] });
 
-  const handleAddTeam = () => {
-    console.log("Adding team:", newTeam);
-    setIsAddModalOpen(false);
-    setNewTeam({ name: "" });
+  const handleAddTeam = async () => {
+    try {
+      await createTeam.mutateAsync(newTeam);
+      setIsAddModalOpen(false);
+      setNewTeam({ name: "", workersIds: [], machine: "", wells: [] });
+    } catch (error) {
+      console.error("Failed to add team:", error);
+    }
   };
 
   if (teamsLoading) {
@@ -47,7 +52,7 @@ export default function TeamPage() {
         <h1 className="text-2xl font-semibold tracking-tight text-gray-900">Жамоалар</h1>
         <Sheet open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
           <SheetTrigger asChild>
-            <button className="flex items-center gap-2 px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg transition-colors">
+            <button className="flex items-center gap-2 px-3 py-1.5 bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg transition-colors text-sm">
               <Plus className="w-4 h-4" />
               <span>Jamoa qo'shish</span>
             </button>
@@ -64,6 +69,19 @@ export default function TeamPage() {
                   onChange={(e) => setNewTeam({ ...newTeam, name: e.target.value })}
                   placeholder="Жамоа номини киритинг"
                 />
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-700 mb-1 block">Машина</label>
+                <select
+                  value={newTeam.machine}
+                  onChange={(e) => setNewTeam({ ...newTeam, machine: e.target.value })}
+                  className="w-full h-8 rounded-lg border border-input bg-transparent px-2.5 py-1 text-sm transition-colors outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+                >
+                  <option value="">Машинани танланг</option>
+                  {machines?.map(machine => (
+                    <option key={machine._id} value={machine._id}>{machine.number}</option>
+                  ))}
+                </select>
               </div>
               <Button onClick={handleAddTeam} className="w-full">
                 Қўшиш

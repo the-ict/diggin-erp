@@ -4,6 +4,7 @@ import { useTransactions } from "@/shared/lib/hooks/use-transactions";
 import { useWareTransactions } from "@/shared/lib/hooks/use-ware-transactions";
 import { TrendingUp, TrendingDown } from "lucide-react";
 import { StatusBadge } from "@/shared/ui/StatusBadge";
+import { SkeletonCard } from "@/shared/ui/SkeletonCard";
 import { Transaction } from "@/shared/config/api/transaction.model";
 import { WareTransaction } from "@/shared/config/api/wareTransaction.model";
 
@@ -74,7 +75,17 @@ export default function MainPage() {
   };
 
   if (transactionsLoading || wareTransactionsLoading) {
-    return <div className="custom-container py-10">Yuklanmoqda...</div>;
+    return (
+      <div className="custom-container space-y-6 py-10">
+        <div className="h-8 w-48 bg-gray-200 rounded animate-pulse"></div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <SkeletonCard />
+          <SkeletonCard />
+        </div>
+        <div className="h-64 bg-gray-200 rounded-xl animate-pulse"></div>
+        <div className="h-64 bg-gray-200 rounded-xl animate-pulse"></div>
+      </div>
+    );
   }
 
   return (

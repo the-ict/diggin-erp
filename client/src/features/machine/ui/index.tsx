@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Truck, MoreVertical, Plus, AlertCircle } from "lucide-react";
-import { useMachines } from "@/shared/lib/hooks/use-machines";
+import { useMachines, useCreateMachine } from "@/shared/lib/hooks/use-machines";
 import { useTeams } from "@/shared/lib/hooks/use-teams";
 import { StatusBadge } from "@/shared/ui/StatusBadge";
 import { SkeletonCard } from "@/shared/ui/SkeletonCard";
@@ -15,9 +15,10 @@ import { Input } from "@/shared/ui/input";
 export default function MachinePage() {
   const { data: machines, isLoading } = useMachines();
   const { data: teams } = useTeams();
+  const createMachine = useCreateMachine();
   const [filterStatus, setFilterStatus] = useState<string>("ALL");
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [newMachine, setNewMachine] = useState({ number: "", status: "ACTIVE" as MachineStatus });
+  const [newMachine, setNewMachine] = useState({ number: "", status: "ACTIVE" as MachineStatus, teamId: "", wells: [] as string[] });
 
   const filteredMachines = machines?.filter(machine => 
     filterStatus === "ALL" || machine.status === filterStatus
@@ -25,10 +26,20 @@ export default function MachinePage() {
 
   const statuses: (MachineStatus | "ALL")[] = ["ALL", "ACTIVE", "REPAIRING"];
 
-  const handleAddMachine = () => {
-    console.log("Adding machine:", newMachine);
-    setIsAddModalOpen(false);
-    setNewMachine({ number: "", status: "ACTIVE" });
+  const statusLabels: Record<MachineStatus | "ALL", string> = {
+    "ALL": "Ҳаммаси",
+    "ACTIVE": "Фаол",
+    "REPAIRING": "Таъмирда"
+  };
+
+  const handleAddMachine = async () => {
+    try {
+      await createMachine.mutateAsync(newMachine);
+      setIsAddModalOpen(false);
+      setNewMachine({ number: "", status: "ACTIVE", teamId: "", wells: [] });
+    } catch (error) {
+      console.error("Failed to add machine:", error);
+    }
   };
 
   if (isLoading) {
@@ -50,7 +61,7 @@ export default function MachinePage() {
         <h1 className="text-2xl font-semibold tracking-tight text-gray-900">Машиналар</h1>
         <Sheet open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
           <SheetTrigger asChild>
-            <button className="flex items-center gap-2 px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg transition-colors">
+            <button className="flex items-center gap-2 px-3 py-1.5 bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg transition-colors text-sm">
               <Plus className="w-4 h-4" />
               <span>Qo'shish</span>
             </button>
@@ -67,6 +78,19 @@ export default function MachinePage() {
                   onChange={(e) => setNewMachine({ ...newMachine, number: e.target.value })}
                   placeholder="Машина рақамини киритинг"
                 />
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-700 mb-1 block">Жамоа</label>
+                <select
+                  value={newMachine.teamId}
+                  onChange={(e) => setNewMachine({ ...newMachine, teamId: e.target.value })}
+                  className="w-full h-8 rounded-lg border border-input bg-transparent px-2.5 py-1 text-sm transition-colors outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+                >
+                  <option value="">Жамоани танланг</option>
+                  {teams?.map(team => (
+                    <option key={team._id} value={team._id}>{team.name}</option>
+                  ))}
+                </select>
               </div>
               <div>
                 <label className="text-sm font-medium text-gray-700 mb-1 block">Ҳолати</label>
@@ -99,7 +123,7 @@ export default function MachinePage() {
                 : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"
             }`}
           >
-            {status}
+            {statusLabels[status]}
           </button>
         ))}
       </div>

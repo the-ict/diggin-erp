@@ -2,16 +2,30 @@
 
 import { useState } from "react";
 import { Package, MoreVertical, Plus, AlertTriangle } from "lucide-react";
-import { useWareItems } from "@/shared/lib/hooks/use-ware-items";
+import { useWareItems, useCreateWareItem } from "@/shared/lib/hooks/use-ware-items";
 import { SkeletonCard } from "@/shared/ui/SkeletonCard";
 import { EmptyState } from "@/shared/ui/EmptyState";
 import { WareItem } from "@/shared/config/api/wareItem.model";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/shared/ui/sheet";
+import { Button } from "@/shared/ui/button";
+import { Input } from "@/shared/ui/input";
 
 export default function WareItemPage() {
   const { data: wareItems, isLoading } = useWareItems();
+  const createWareItem = useCreateWareItem();
   const [filterStock, setFilterStock] = useState<string>("ALL");
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [newWareItem, setNewWareItem] = useState({ name: "", quantity: 0 });
 
   const MINIMUM_QUANTITY = 10;
+
+  const stockOptions = ["ALL", "LOW", "NORMAL"] as const;
+
+  const stockLabels: Record<typeof stockOptions[number], string> = {
+    "ALL": "Ҳаммаси",
+    "LOW": "Кам миқдор",
+    "NORMAL": "Нормал"
+  };
 
   const filteredItems = wareItems?.filter(item => {
     if (filterStock === "ALL") return true;
@@ -19,6 +33,16 @@ export default function WareItemPage() {
     if (filterStock === "NORMAL") return item.quantity > MINIMUM_QUANTITY;
     return true;
   });
+
+  const handleAddWareItem = async () => {
+    try {
+      await createWareItem.mutateAsync(newWareItem);
+      setIsAddModalOpen(false);
+      setNewWareItem({ name: "", quantity: 0 });
+    } catch (error) {
+      console.error("Failed to add ware item:", error);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -37,15 +61,46 @@ export default function WareItemPage() {
     <div className="custom-container space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold tracking-tight text-gray-900">Омбор Махсулотлари</h1>
-        <button className="flex items-center gap-2 px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg transition-colors">
-          <Plus className="w-4 h-4" />
-          <span>Qo'shish</span>
-        </button>
+        <Sheet open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
+          <SheetTrigger asChild>
+            <button className="flex items-center gap-2 px-3 py-1.5 bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg transition-colors text-sm">
+              <Plus className="w-4 h-4" />
+              <span>Qo'shish</span>
+            </button>
+          </SheetTrigger>
+          <SheetContent>
+            <SheetHeader>
+              <SheetTitle>Янги махсулот қўшиш</SheetTitle>
+            </SheetHeader>
+            <div className="space-y-4 mt-4">
+              <div>
+                <label className="text-sm font-medium text-gray-700 mb-1 block">Махсулот номи</label>
+                <Input
+                  value={newWareItem.name}
+                  onChange={(e) => setNewWareItem({ ...newWareItem, name: e.target.value })}
+                  placeholder="Махсулот номини киритинг"
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-700 mb-1 block">Миқдор</label>
+                <Input
+                  value={newWareItem.quantity.toString()}
+                  onChange={(e) => setNewWareItem({ ...newWareItem, quantity: Number(e.target.value) })}
+                  placeholder="Миқдорни киритинг"
+                  type="number"
+                />
+              </div>
+              <Button onClick={handleAddWareItem} className="w-full">
+                Қўшиш
+              </Button>
+            </div>
+          </SheetContent>
+        </Sheet>
       </div>
 
       {/* Stock Filter */}
       <div className="flex items-center gap-2">
-        {["ALL", "LOW", "NORMAL"].map((status) => (
+        {stockOptions.map((status) => (
           <button
             key={status}
             onClick={() => setFilterStock(status)}
@@ -55,7 +110,7 @@ export default function WareItemPage() {
                 : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"
             }`}
           >
-            {status}
+            {stockLabels[status]}
           </button>
         ))}
       </div>
