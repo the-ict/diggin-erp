@@ -6,13 +6,13 @@ const menu: MenuItem[] = [
   { title: 'Ҳаммаси', url: '/dashboard', icon: LayoutGrid },
   {
     title: 'Ишчилар',
-    url: '/dashboard/workers',
+    url: '/dashboard/worker',
     items: [
       {
         title: 'Барча ишчилар',
         description: 'Ҳамма ишчилар рўйхати',
         icon: Users,
-        url: '/dashboard/workers',
+        url: '/dashboard/worker',
       },
       {
         title: 'Жамоалар',
@@ -24,7 +24,7 @@ const menu: MenuItem[] = [
   },
   {
     title: 'Техника',
-    url: '/dashboard/machines',
+    url: '/dashboard/machine',
     items: [
       {
         title: 'Машиналар',
@@ -54,7 +54,7 @@ const menu: MenuItem[] = [
         title: 'Транзакциялар',
         description: 'Омбор кириш-чиқиши',
         icon: ArrowLeftRight,
-        url: '/dashboard/transactions',
+        url: '/dashboard/transaction',
       },
     ],
   },

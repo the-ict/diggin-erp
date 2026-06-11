@@ -9,6 +9,8 @@ export default function PageLink() {
 
     const renderPageName = () => {
         switch(pageName) {
+            case "worker":
+                return "Ишчилар";
             case "team":
                 return "Жамоа";
             default: 
