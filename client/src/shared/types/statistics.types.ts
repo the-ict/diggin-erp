@@ -1,0 +1,1 @@
+export type StatisticsDataTYPE = "WORKER" | "TRANSACTION" | "TEAM" | "WELL" | "WAREITEM" | "WARETRANSACTION" | "PURCHASE";

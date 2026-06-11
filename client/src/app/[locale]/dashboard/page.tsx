@@ -1,5 +1,5 @@
+import MainPage from "@/features/main/ui";
+
 export default function Component() {
-  return (
-    <>Hello this is dashbaord</>
-  );
+  return <MainPage />;
 }
