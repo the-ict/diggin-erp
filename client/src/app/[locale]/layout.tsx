@@ -50,7 +50,6 @@ export default async function RootLayout({ children, params }: Props) {
             <QueryProvider>
               <Navbar />
               {children}
-              <Footer />
             </QueryProvider>
           </ThemeProvider>
         </NextIntlClientProvider>
