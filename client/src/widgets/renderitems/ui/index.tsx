@@ -3,7 +3,7 @@ import { Dot, EllipsisVertical, User } from "lucide-react";
 
 export default function RenderCards() {
   return (
-    <div className="flex items-start justify-between py-4 border-b-2 border-gray-300 ">
+    <div className="flex items-start justify-between py-4 border-b-2 border-gray-300 w-full">
       <div className="flex items-center gap-4">
         <div className="p-2 bg-gray-100 h-full rounded-lg cursor-pointer">
           <User />

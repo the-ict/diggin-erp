@@ -37,20 +37,13 @@ export default async function RootLayout({ children, params }: Props) {
   setRequestLocale(locale);
 
   return (
-    <html lang={locale} suppressHydrationWarning>
+    <html lang={locale} className="light" suppressHydrationWarning>
       <body className={`${robotoText.variable} antialiased`}>
         <NextIntlClientProvider locale={locale}>
-          <ThemeProvider
-            attribute={'class'}
-            defaultTheme="light"
-            enableSystem
-            disableTransitionOnChange
-          >
-            <QueryProvider>
-              <Navbar />
-              {children}
-            </QueryProvider>
-          </ThemeProvider>
+          <QueryProvider>
+            <Navbar />
+            {children}
+          </QueryProvider>
         </NextIntlClientProvider>
       </body>
       <Script

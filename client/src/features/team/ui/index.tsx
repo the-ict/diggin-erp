@@ -1,0 +1,130 @@
+"use client";
+
+import { useState } from "react";
+import { Users, Truck, MapPin, MoreVertical, Plus } from "lucide-react";
+import { useTeams } from "@/shared/lib/hooks/use-teams";
+import { useWorkers } from "@/shared/lib/hooks/use-workers";
+import { useMachines } from "@/shared/lib/hooks/use-machines";
+import { StatusBadge } from "@/shared/ui/StatusBadge";
+import { SkeletonCard } from "@/shared/ui/SkeletonCard";
+import { EmptyState } from "@/shared/ui/EmptyState";
+import { Team } from "@/shared/config/api/team.model";
+import { Worker } from "@/shared/config/api/worker.model";
+import { Machine } from "@/shared/config/api/machine.model";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/shared/ui/sheet";
+import { Button } from "@/shared/ui/button";
+import { Input } from "@/shared/ui/input";
+
+export default function TeamPage() {
+  const { data: teams, isLoading: teamsLoading } = useTeams();
+  const { data: workers } = useWorkers();
+  const { data: machines } = useMachines();
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [newTeam, setNewTeam] = useState({ name: "" });
+
+  const handleAddTeam = () => {
+    console.log("Adding team:", newTeam);
+    setIsAddModalOpen(false);
+    setNewTeam({ name: "" });
+  };
+
+  if (teamsLoading) {
+    return (
+      <div className="custom-container space-y-6">
+        <div className="flex items-center justify-between">
+          <h1 className="text-2xl font-semibold tracking-tight text-gray-900">Жамоалар</h1>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {[1, 2, 3, 4].map(i => <SkeletonCard key={i} />)}
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="custom-container space-y-6">
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-semibold tracking-tight text-gray-900">Жамоалар</h1>
+        <Sheet open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
+          <SheetTrigger asChild>
+            <button className="flex items-center gap-2 px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg transition-colors">
+              <Plus className="w-4 h-4" />
+              <span>Jamoa qo'shish</span>
+            </button>
+          </SheetTrigger>
+          <SheetContent>
+            <SheetHeader>
+              <SheetTitle>Янги жамоа қўшиш</SheetTitle>
+            </SheetHeader>
+            <div className="space-y-4 mt-4">
+              <div>
+                <label className="text-sm font-medium text-gray-700 mb-1 block">Жамоа номи</label>
+                <Input
+                  value={newTeam.name}
+                  onChange={(e) => setNewTeam({ ...newTeam, name: e.target.value })}
+                  placeholder="Жамоа номини киритинг"
+                />
+              </div>
+              <Button onClick={handleAddTeam} className="w-full">
+                Қўшиш
+              </Button>
+            </div>
+          </SheetContent>
+        </Sheet>
+      </div>
+
+      {teams && teams.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {teams.map((team: Team) => {
+            const teamWorkers = workers?.filter(w => team.workersIds.includes(w._id)) || [];
+            const teamMachine = machines?.find(m => m._id === team.machine);
+
+            return (
+              <div key={team._id} className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <h3 className="font-semibold text-lg text-gray-900">{team.name}</h3>
+                    <p className="text-xs text-gray-500">{team.workersIds.length} ishchi · {team.wells.length} quduq</p>
+                  </div>
+                  <button className="text-gray-400 hover:text-gray-600 transition-colors">
+                    <MoreVertical className="w-5 h-5" />
+                  </button>
+                </div>
+
+                {/* Machine */}
+                <div className="flex items-center gap-2 mb-4 p-3 bg-gray-50 rounded-lg">
+                  <Truck className="w-4 h-4 text-gray-500" />
+                  <span className="text-sm text-gray-900">{teamMachine?.number ?? "Mashina yo'q"}</span>
+                  {teamMachine && <StatusBadge status={teamMachine.status} />}
+                </div>
+
+                {/* Workers */}
+                <div className="grid grid-cols-2 gap-2">
+                  {teamWorkers.slice(0, 4).map((worker: Worker) => (
+                    <div key={worker._id} className="flex items-center gap-2 p-2 bg-gray-50 rounded-lg">
+                      <div className="w-6 h-6 rounded bg-indigo-100 flex items-center justify-center text-xs text-indigo-600">
+                        {worker.name[0]}
+                      </div>
+                      <div>
+                        <p className="text-xs font-medium text-gray-900">{worker.name}</p>
+                        <p className="text-xs text-gray-500">{worker.position}</p>
+                      </div>
+                    </div>
+                  ))}
+                  {teamWorkers.length === 0 && (
+                    <p className="text-xs text-gray-500 col-span-2">Ishchilar yo'q</p>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      ) : (
+        <EmptyState
+          title="Jamoa topilmadi"
+          description="Hozircha hech qanday jamoa qo'shilmagan"
+        />
+      )}
+    </div>
+  );
+}

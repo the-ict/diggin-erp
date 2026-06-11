@@ -1,7 +1,5 @@
+import WellPage from "@/features/well/ui";
 
-
-export default function Component() {
-  return (
-    <></>
-  );
+export default function page() {
+  return <WellPage />;
 }

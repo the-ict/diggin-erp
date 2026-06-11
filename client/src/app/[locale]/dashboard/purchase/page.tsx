@@ -1,7 +1,5 @@
+import PurchasePage from "@/features/purchase/ui";
 
-
-export default function Component() {
-  return (
-    <></>
-  );
+export default function page() {
+  return <PurchasePage />;
 }

@@ -5,6 +5,7 @@ const workerSchema = new mongoose.Schema<IWorkerModel>({
     name: String,
     phone: String,
     teamId: String,
+    position: String,
 });
 
 export const WorkerModel = mongoose.model("Worker", workerSchema);

@@ -179,6 +179,7 @@ export default function HistoryChart() {
           <LineChart
             accessibilityLayer
             data={chartData}
+            style={{ color: "blue" }}
             margin={{
               left: 12,
               right: 12,

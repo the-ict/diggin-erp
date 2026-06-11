@@ -1,7 +1,5 @@
+import WareTransactionPage from "@/features/waretransaction/ui";
 
-
-export default function Component() {
-  return (
-    <></>
-  );
+export default function page() {
+  return <WareTransactionPage />;
 }
