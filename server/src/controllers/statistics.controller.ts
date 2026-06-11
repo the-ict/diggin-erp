@@ -1,8 +1,8 @@
-import type { Request, Response, NextFunction } from "express"
-import { WorkerModel } from "../models/worker.model.js";
-import { MachineModel } from "../models/machine.model.js";
-import { Purchase } from "../models/purchase.model.js";
 import { WareTransaction } from "../models/waretransaction.model.js";
+import type { Request, Response, NextFunction } from "express"
+import { MachineModel } from "../models/machine.model.js";
+import { WorkerModel } from "../models/worker.model.js";
+import { Purchase } from "../models/purchase.model.js";
 import { WareItem } from "../models/wareitem.model.js";
 import { TeamModel } from "../models/team.model.js";
 import { Well } from "../models/well.model.js";
@@ -168,4 +168,3 @@ export const totalWells12Month = async (req: Request, res: Response, next: NextF
         next(error);
     }
 };
-
