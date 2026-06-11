@@ -1,77 +1,80 @@
-import { Book, Sunset, Trees, Zap } from 'lucide-react';
+import { Users, User, Wrench, Truck, MapPin, Package, ArrowLeftRight, ShoppingCart, LayoutGrid } from 'lucide-react';
 import { MenuItem } from './model';
 import { LanguageRoutes } from '@/shared/config/i18n/types';
 
 const menu: MenuItem[] = [
-  { title: 'Home', url: '#' },
+  { title: 'Ҳаммаси', url: '/dashboard', icon: LayoutGrid },
   {
-    title: 'Products',
-    url: '#',
+    title: 'Ишчилар',
+    url: '/dashboard/workers',
     items: [
       {
-        title: 'Blog',
-        description: 'The latest industry news, updates, and info',
-        icon: Book,
-        url: '#',
+        title: 'Барча ишчилар',
+        description: 'Ҳамма ишчилар рўйхати',
+        icon: Users,
+        url: '/dashboard/workers',
       },
       {
-        title: 'Company',
-        description: 'Our mission is to innovate and empower the world',
-        icon: Trees,
-        url: '#',
-      },
-      {
-        title: 'Careers',
-        description: 'Browse job listing and discover our workspace',
-        icon: Sunset,
-        url: '#',
-      },
-      {
-        title: 'Support',
-        description:
-          'Get in touch with our support team or visit our community forums',
-        icon: Zap,
-        url: '#',
+        title: 'Жамоалар',
+        description: 'Ишчилар жамоалари',
+        icon: User,
+        url: '/dashboard/teams',
       },
     ],
   },
   {
-    title: 'Resources',
-    url: '#',
+    title: 'Техника',
+    url: '/dashboard/machines',
     items: [
       {
-        title: 'Help Center',
-        description: 'Get all the answers you need right here',
-        icon: Zap,
-        url: '#',
+        title: 'Машиналар',
+        description: 'Барча машиналар рўйхати',
+        icon: Truck,
+        url: '/dashboard/machines',
       },
       {
-        title: 'Contact Us',
-        description: 'We are here to help you with any questions you have',
-        icon: Sunset,
-        url: '#',
-      },
-      {
-        title: 'Status',
-        description: 'Check the current status of our services and APIs',
-        icon: Trees,
-        url: '#',
-      },
-      {
-        title: 'Terms of Service',
-        description: 'Our terms and conditions for using our services',
-        icon: Book,
-        url: '#',
+        title: 'Қудуқлар',
+        description: 'Қудуқлар маълумотлари',
+        icon: MapPin,
+        url: '/dashboard/wells',
       },
     ],
   },
   {
-    title: 'Pricing',
-    url: '#',
+    title: 'Омбор',
+    url: '/dashboard/warehouse',
+    items: [
+      {
+        title: 'Махсулотлар',
+        description: 'Омбордаги махсулотлар',
+        icon: Package,
+        url: '/dashboard/warehouse',
+      },
+      {
+        title: 'Транзакциялар',
+        description: 'Омбор кириш-чиқиши',
+        icon: ArrowLeftRight,
+        url: '/dashboard/transactions',
+      },
+    ],
   },
   {
-    title: 'Blog',
-    url: '#',
+    title: 'Олди Сотди',
+    url: '/dashboard/purchases',
+    items: [
+      {
+        title: 'Харидлар',
+        description: 'Барча харидлар рўйхати',
+        icon: ShoppingCart,
+        url: '/dashboard/purchases',
+      },
+      {
+        title: 'Транзакциялар',
+        description: 'Пул транзакциялари',
+        icon: ArrowLeftRight,
+        url: '/dashboard/transactions',
+      },
+    ],
   },
 ];
 
