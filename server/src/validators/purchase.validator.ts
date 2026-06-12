@@ -4,6 +4,7 @@ const createPurchaseValidator = Joi.object({
     name: Joi.string().required(),
     quantity: Joi.number().required().min(0),
     price: Joi.number().required().min(0),
+    type: Joi.string().valid("INCOME","OUTCOME"),
     note: Joi.string().optional(),
 });
 

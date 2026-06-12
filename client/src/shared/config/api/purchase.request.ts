@@ -4,7 +4,10 @@ import { Purchase, CreatePurchaseDto, UpdatePurchaseDto } from "./purchase.model
 const headers = { "Content-Type": "application/json" };
 
 export const purchaseRequests = {
-  getAll: async (): Promise<Purchase[]> => {
+  getAll: async (): Promise<{
+    success: boolean;
+    data: Purchase[];
+  }> => {
     const res = await fetch(URLS.purchases);
     if (!res.ok) throw new Error("Failed to fetch purchases");
     return res.json();

@@ -7,8 +7,6 @@ const purchaseSchema = new mongoose.Schema<IPurchaseModel>({
     price: { type: Number, required: true },
     note: { type: String, required: false },
     type: { type: String, required: true },
-    createdAt: { type: Date, default: Date.now },
-    updatedAt: { type: Date, default: Date.now },
 },{
     timestamps: true,
 });

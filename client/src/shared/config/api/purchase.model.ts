@@ -11,6 +11,7 @@ export interface CreatePurchaseDto {
   name: string;
   quantity: number;
   price: number;
+  type: "INCOME" | "OUTCOME";
   note?: string;
 }
 
