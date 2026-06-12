@@ -12,6 +12,13 @@ declare const messages: {
     "purchase": "Xaridlar",
     "transaction": "Tranzaksiyalar"
   },
+  "Login": {
+    "title": "Tizimga kirish",
+    "username": "Foydalanuvchi nomi",
+    "password": "Parol",
+    "login": "Kirish",
+    "loading": "Yuklanmoqda..."
+  },
   "Dashboard": {
     "title": "Bosh sahifa",
     "monthlyIncome": "Oylik Kirim",

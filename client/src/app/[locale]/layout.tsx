@@ -11,6 +11,7 @@ import { ReactNode } from 'react';
 import { setRequestLocale } from 'next-intl/server';
 import QueryProvider from '@/shared/config/react-query/QueryProvider';
 import Script from 'next/script';
+import { AuthProvider } from '@/shared/lib/hooks/use-auth';
 
 export const metadata: Metadata = {
   title: PRODUCT_INFO.name,
@@ -41,8 +42,10 @@ export default async function RootLayout({ children, params }: Props) {
       <body className={`${robotoText.variable} antialiased ${robotoText.className}`}>
         <NextIntlClientProvider locale={locale}>
           <QueryProvider>
-            <Navbar />
-            {children}
+            <AuthProvider>
+              <Navbar />
+              {children}
+            </AuthProvider>
           </QueryProvider>
         </NextIntlClientProvider>
       </body>

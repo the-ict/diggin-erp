@@ -19,6 +19,7 @@ import machineRoutes from "./routers/machine.routes.js";
 import workerRoutes from "./routers/worker.routes.js";
 import wellRoutes from "./routers/well.routes.js";
 import teamRoutes from "./routers/team.routes.js";
+import userRoutes from "./routes/user.routes.js";
 
 // initialize express
 const app = express();
@@ -44,6 +45,7 @@ app.use("/api/ware-items", wareItemRoutes);
 app.use("/api/ware-transactions", wareTransactionRoutes);
 app.use("/api/purchases", purchaseRoutes);
 app.use("/api/teams", teamRoutes);
+app.use("/api/users", userRoutes);
 
 // error handler
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {

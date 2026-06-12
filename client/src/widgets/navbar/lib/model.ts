@@ -4,4 +4,5 @@ export interface MenuItem {
   description?: string;
   icon?: React.ComponentType<{ className?: string }>;
   items?: MenuItem[];
+  roles?: string[];
 }

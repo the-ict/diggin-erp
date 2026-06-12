@@ -18,8 +18,21 @@ import {
   NavigationMenuList,
 } from '@/shared/ui/navigation-menu';
 import Link from 'next/link';
+import { useAuth } from '@/shared/lib/hooks/use-auth';
+import { usePathname } from 'next/navigation';
 
 const Navbar = () => {
+  const { user, logout } = useAuth();
+  const pathname = usePathname();
+
+  const filteredMenu = menu.filter((item) => {
+    if (!user) return false;
+    if (!item.roles) return true;
+    return item.roles.includes(user.role);
+  });
+
+  if(pathname.includes("login")) return;
+
   return (
     <section className="py-4 bg-white">
       <div className="custom-container">
@@ -28,13 +41,18 @@ const Navbar = () => {
             <div className="flex items-center">
               <NavigationMenu>
                 <NavigationMenuList>
-                  {menu.map((item) => RenderMenuItem(item))}
+                  {filteredMenu.map((item) => RenderMenuItem(item))}
                 </NavigationMenuList>
               </NavigationMenu>
             </div>
           </div>
           <div className="flex items-center gap-4">
             <ChangeLang />
+            {user && (
+              <Button variant="outline" onClick={logout}>
+                Logout
+              </Button>
+            )}
           </div>
         </nav>
 
@@ -62,8 +80,13 @@ const Navbar = () => {
                 </SheetHeader>
                 <div className="flex flex-col gap-6 p-4">
                   <div className="flex w-full flex-col gap-4">
-                    {menu.map((item) => RenderMobileMenuItem(item))}
+                    {filteredMenu.map((item) => RenderMobileMenuItem(item))}
                   </div>
+                  {user && (
+                    <Button variant="outline" onClick={logout} className="w-full">
+                      Logout
+                    </Button>
+                  )}
                 </div>
               </SheetContent>
             </Sheet>

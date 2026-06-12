@@ -26,16 +26,36 @@ import {
   Pie,
   Legend,
 } from "recharts";
+import { useAuth } from "@/shared/lib/hooks/use-auth";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 export default function MainPage() {
   const t = useTranslations("Dashboard");
   const tWells = useTranslations("Wells");
   const tCommon = useTranslations("Common");
+  const { user, isAuthenticated } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      router.push("/login");
+    }
+  }, [isAuthenticated, router]);
+
+  if (!isAuthenticated) {
+    return null;
+  }
 
   const { data: transactions, isLoading: transactionsLoading } = useTransactions();
   const { data: wareTransactions, isLoading: wareTransactionsLoading } = useWareTransactions();
   const { data: wells, isLoading: wellsLoading } = useWells();
   const { data: wareItems, isLoading: wareItemsLoading } = useWareItems();
+
+  // Filter wells by team for WORKER role
+  const filteredWells = user?.role === "WORKER" && user.teamId
+    ? wells?.filter((well) => well.team === user.teamId)
+    : wells;
 
   const currentMonth = new Date().getMonth();
   const currentYear = new Date().getFullYear();
@@ -80,8 +100,8 @@ export default function MainPage() {
       }
     });
 
-  const wellStatusCounts = Array.isArray(wells)
-    ? wells.reduce((acc: Record<string, number>, w) => {
+  const wellStatusCounts = Array.isArray(filteredWells)
+    ? filteredWells.reduce((acc: Record<string, number>, w) => {
       acc[w.status] = (acc[w.status] || 0) + 1;
       return acc;
     }, {})
@@ -291,8 +311,8 @@ export default function MainPage() {
           <h2 className="text-lg font-semibold text-gray-900">{tWells("title")}</h2>
         </div>
         <div className="space-y-4">
-          {Array.isArray(wells) && wells.length > 0 ? (
-            wells
+          {Array.isArray(filteredWells) && filteredWells.length > 0 ? (
+            filteredWells
               .slice(0, 2)
               .map((well) => {
                 const progress = well.except_length > 0 ? (well.length / well.except_length) * 100 : 0;
