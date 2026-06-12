@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { wareItemRequests } from "@/shared/config/api/wareItem.request";
-import { CreateWareItemDto, UpdateWareItemDto } from "@/shared/config/api/wareItem.model";
+import { CreateWareTransaction, UpdateWareItemDto } from "@/shared/config/api/wareItem.model";
 
 export const WARE_ITEM_KEYS = {
   all: ["wareItems"] as const,
@@ -39,3 +39,11 @@ export function useDeleteWareItem() {
     onSuccess: () => qc.invalidateQueries({ queryKey: WARE_ITEM_KEYS.all }),
   });
 }
+
+export function useCreateWareTransaction() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: CreateWareTransaction }) => wareItemRequests.createTransaction(id, data),
+    onSuccess: () => qc.invalidateQueries({ queryKey: WARE_ITEM_KEYS.all }),
+  });
+};

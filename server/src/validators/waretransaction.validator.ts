@@ -2,8 +2,9 @@ import Joi from "joi";
 
 const createWareTransactionValidator = Joi.object({
     wareItemId: Joi.string().required(),
-    quantity: Joi.number().required().min(0),
+    quantity: Joi.number().required().min(1),
     type: Joi.string().valid("INCOME", "OUTCOME").required(),
+    givenToWorker: Joi.string().required(),
 });
 
 const updateWareTransactionValidator = Joi.object({

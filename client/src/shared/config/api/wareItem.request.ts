@@ -1,5 +1,5 @@
 import { URLS } from "./URLs";
-import { WareItem, CreateWareItemDto, UpdateWareItemDto } from "./wareItem.model";
+import { WareItem, CreateWareItemDto, UpdateWareItemDto, CreateWareTransaction } from "./wareItem.model";
 
 const headers = { "Content-Type": "application/json" };
 
@@ -41,4 +41,13 @@ export const wareItemRequests = {
     const res = await fetch(URLS.wareItem(id), { method: "DELETE" });
     if (!res.ok) throw new Error("Failed to delete ware item");
   },
+  createTransaction: async(id:string,data: CreateWareTransaction) => {
+    const res  = await fetch(URLS.wareTransaction(id), {
+      method: "POST",
+      headers,
+      body: JSON.stringify(data),
+    });
+    if (!res.ok) throw new Error("Failed to create ware transaction");
+    return res.json();
+  }
 };

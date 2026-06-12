@@ -9,4 +9,11 @@ export interface CreateWareItemDto {
   quantity: number;
 }
 
-export interface UpdateWareItemDto extends Partial<CreateWareItemDto> {}
+export interface CreateWareTransaction {
+  wareItemId: string;
+  quantity: number;
+  type: "INCOME" | "OUTCOME";
+  givenToWorker: string;
+}
+
+export interface UpdateWareItemDto extends Partial<CreateWareItemDto> { }
