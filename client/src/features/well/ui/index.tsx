@@ -222,9 +222,9 @@ export default function WellPage() {
       {/* Wells Table */}
       {filteredWells && filteredWells.length > 0 ? (
         <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
-          <table className="w-full pt-4">
+          <table className="overflow-x-auto">
             <thead>
-              <tr className="border-b border-gray-200 text-xs text-gray-500 uppercase tracking-wider">
+              <tr className="border-b border-gray-200 bg-gray-50 text-xs text-gray-500 uppercase tracking-wider">
                 <th className="pb-3 text-left px-6">Jamoa</th>
                 <th className="pb-3 text-left px-6">Кутилаётган узунлик</th>
                 <th className="pb-3 text-left px-6">Status</th>
