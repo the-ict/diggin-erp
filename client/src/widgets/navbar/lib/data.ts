@@ -50,12 +50,6 @@ const menu: MenuItem[] = [
         icon: Package,
         url: '/dashboard/wareitem',
       },
-      {
-        title: 'Транзакциялар',
-        description: 'Омбор кириш-чиқиши',
-        icon: ArrowLeftRight,
-        url: '/dashboard/waretransaction',
-      },
     ],
   },
   {
