@@ -12,31 +12,29 @@ import { StatusBadge } from "@/shared/ui/StatusBadge";
 import { EmptyState } from "@/shared/ui/EmptyState";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
+import { useTranslations } from "next-intl";
 
 export default function MachinePage() {
+  const t = useTranslations("Machines");
+  const tCommon = useTranslations("Common");
+
   const { data: machines, isLoading } = useMachines();
   const { data: teams } = useTeams();
   const createMachine = useCreateMachine();
   const updateMachine = useUpdateMachine();
   const deleteMachine = useDeleteMachine();
+
   const [filterStatus, setFilterStatus] = useState<string>("ALL");
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [newMachine, setNewMachine] = useState({ number: "", status: "ACTIVE" as MachineStatus, teamId: "", wells: [] as string[] });
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingMachine, setEditingMachine] = useState<Machine | null>(null);
 
-
   const filteredMachines = Array.isArray(machines) ? machines.filter(machine =>
     filterStatus === "ALL" || machine.status === filterStatus
   ) : [];
 
   const statuses: (MachineStatus | "ALL")[] = ["ALL", "ACTIVE", "REPAIRING"];
-
-  const statusLabels: Record<MachineStatus | "ALL", string> = {
-    "ALL": "Ҳаммаси",
-    "ACTIVE": "Фаол",
-    "REPAIRING": "Таъмирда"
-  };
 
   const handleAddMachine = async () => {
     try {
@@ -52,13 +50,16 @@ export default function MachinePage() {
     if(!editingMachine) return;
     try {
       await updateMachine.mutateAsync({ id: editingMachine._id, data: newMachine });
+      setIsEditModalOpen(false);
+      setEditingMachine(null);
+      setNewMachine({ number: "", status: "ACTIVE", teamId: "", wells: [] });
     } catch (error) {
       console.log("Failed to update machine:", error);
     };
   };
 
   const handleDeleteMachine = async (machine: Machine) => {
-    if (!confirm("Машини ўчирмоқчимисиз?")) return;
+    if (!confirm(tCommon("confirmDelete"))) return;
     try {
       await deleteMachine.mutateAsync(machine._id);
       setEditingMachine(null);
@@ -68,11 +69,12 @@ export default function MachinePage() {
       console.log("Failed to delete machine:", error);
     };
   }
+
   if (isLoading) {
     return (
       <div className="custom-container space-y-6">
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-semibold tracking-tight text-gray-900">Машиналар</h1>
+          <h1 className="text-2xl font-semibold tracking-tight text-gray-900">{t("title")}</h1>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {[1, 2, 3, 4, 5, 6].map(i => <SkeletonCard key={i} />)}
@@ -84,53 +86,53 @@ export default function MachinePage() {
   return (
     <div className="custom-container space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold tracking-tight text-gray-900">Машиналар</h1>
+        <h1 className="text-2xl font-semibold tracking-tight text-gray-900">{t("title")}</h1>
         <Sheet open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
           <SheetTrigger asChild>
             <button className="flex items-center gap-2 px-3 py-1.5 bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg transition-colors text-sm">
               <Plus className="w-4 h-4" />
-              <span>Qo'shish</span>
+              <span>{tCommon("add")}</span>
             </button>
           </SheetTrigger>
           <SheetContent>
             <SheetHeader>
-              <SheetTitle>Янги машина қўшиш</SheetTitle>
+              <SheetTitle>{t("addTitle")}</SheetTitle>
             </SheetHeader>
             <div className="space-y-4 mt-4">
               <div>
-                <label className="text-sm font-medium text-gray-700 mb-1 block">Машина рақами</label>
+                <label className="text-sm font-medium text-gray-700 mb-1 block">{t("number")}</label>
                 <Input
                   value={newMachine.number}
                   onChange={(e) => setNewMachine({ ...newMachine, number: e.target.value })}
-                  placeholder="Машина рақамини киритинг"
+                  placeholder={t("placeholderNumber")}
                 />
               </div>
               <div>
-                <label className="text-sm font-medium text-gray-700 mb-1 block">Жамоа</label>
+                <label className="text-sm font-medium text-gray-700 mb-1 block">{t("team")}</label>
                 <select
                   value={newMachine.teamId}
                   onChange={(e) => setNewMachine({ ...newMachine, teamId: e.target.value })}
                   className="w-full h-8 rounded-lg border border-input bg-transparent px-2.5 py-1 text-sm transition-colors outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
                 >
-                  <option value="">Жамоани танланг</option>
+                  <option value="">{t("selectTeam")}</option>
                   {Array.isArray(teams) && teams.map(team => (
                     <option key={team._id} value={team._id}>{team.name}</option>
                   ))}
                 </select>
               </div>
               <div>
-                <label className="text-sm font-medium text-gray-700 mb-1 block">Ҳолати</label>
+                <label className="text-sm font-medium text-gray-700 mb-1 block">{t("status")}</label>
                 <select
                   value={newMachine.status}
                   onChange={(e) => setNewMachine({ ...newMachine, status: e.target.value as MachineStatus })}
                   className="w-full h-8 rounded-lg border border-input bg-transparent px-2.5 py-1 text-sm transition-colors outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
                 >
-                  <option value="ACTIVE">Фаол</option>
-                  <option value="REPAIRING">Таъмирда</option>
+                  <option value="ACTIVE">{t("statuses.ACTIVE")}</option>
+                  <option value="REPAIRING">{t("statuses.REPAIRING")}</option>
                 </select>
               </div>
               <Button onClick={handleAddMachine} className="w-full">
-                Қўшиш
+                {tCommon("add")}
               </Button>
             </div>
           </SheetContent>
@@ -140,11 +142,11 @@ export default function MachinePage() {
         <Sheet open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
           <SheetContent>
             <SheetHeader>
-              <SheetTitle>Машинани таҳрирлаш</SheetTitle>
+              <SheetTitle>{t("editTitle")}</SheetTitle>
             </SheetHeader>
             <div className="space-y-4 mt-4">
               <div>
-                <label className="text-sm font-medium text-gray-700 mb-1 block">Машина рақами</label>
+                <label className="text-sm font-medium text-gray-700 mb-1 block">{t("number")}</label>
                 <Input
                   type="text"
                   value={newMachine.number}
@@ -152,8 +154,19 @@ export default function MachinePage() {
                   className="w-full h-8 rounded-lg border border-input bg-transparent px-2.5 py-1 text-sm transition-colors outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
                 />
               </div>
+              <div>
+                <label className="text-sm font-medium text-gray-700 mb-1 block">{t("status")}</label>
+                <select
+                  value={newMachine.status}
+                  onChange={(e) => setNewMachine({ ...newMachine, status: e.target.value as MachineStatus })}
+                  className="w-full h-8 rounded-lg border border-input bg-transparent px-2.5 py-1 text-sm transition-colors outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+                >
+                  <option value="ACTIVE">{t("statuses.ACTIVE")}</option>
+                  <option value="REPAIRING">{t("statuses.REPAIRING")}</option>
+                </select>
+              </div>
               <Button onClick={handleUpdateMachine} className="w-full">
-                Сақлаш
+                {tCommon("save")}
               </Button>
             </div>
           </SheetContent>
@@ -171,7 +184,7 @@ export default function MachinePage() {
               : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"
               }`}
           >
-            {statusLabels[status]}
+            {status === "ALL" ? t("all") : t(`statuses.${status}`)}
           </button>
         ))}
       </div>
@@ -198,11 +211,13 @@ export default function MachinePage() {
                         setIsEditModalOpen(true);
                         setEditingMachine(machine);
                         setNewMachine({
-                          number:machine.number,
-                          status: machine.status
-                        } as Machine)
-                      }}>Таҳрирлаш</DropdownMenuItem>
-                      <DropdownMenuItem className="text-red-600" onClick={() => handleDeleteMachine(machine)}>Ўчириш</DropdownMenuItem>
+                          number: machine.number,
+                          status: machine.status,
+                          teamId: machine.teamId,
+                          wells: machine.wells,
+                        } as any);
+                      }}>{tCommon("edit")}</DropdownMenuItem>
+                      <DropdownMenuItem className="text-red-600" onClick={() => handleDeleteMachine(machine)}>{tCommon("delete")}</DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </div>
@@ -211,7 +226,7 @@ export default function MachinePage() {
                 <div className="mt-4 pt-4 text-sm text-gray-500">
                   <div className="flex items-center gap-2">
                     <AlertCircle className="w-4 h-4" />
-                    <span>{machine.wells.length} ta quduq qazilgan</span>
+                    <span>{t("wellsCount", { count: machine.wells.length })}</span>
                   </div>
                   <div className="mt-1">{team?.name ?? "Jamoa yo'q"}</div>
                 </div>
@@ -221,8 +236,8 @@ export default function MachinePage() {
         </div>
       ) : (
         <EmptyState
-          title="Mashinalar topilmadi"
-          description="Hozircha hech qanday mashina qo'shilmagan"
+          title={tCommon("empty")}
+          description=""
         />
       )}
     </div>

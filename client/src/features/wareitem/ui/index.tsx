@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Package, MoreVertical, Plus, AlertTriangle, Check, ArrowDownUp } from "lucide-react";
 import { useWareItems, useCreateWareItem, useUpdateWareItem, useDeleteWareItem } from "@/shared/lib/hooks/use-ware-items";
 import { useWareTransactions, useCreateWareTransaction } from "@/shared/lib/hooks/use-ware-transactions";
@@ -18,13 +18,14 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/sh
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
 import { useWorkers } from "@/shared/lib/hooks/use-workers";
-
-const transactionTypeLabels: Record<WareTransaction["type"], string> = {
-  INCOME: "Кирим",
-  OUTCOME: "Чиқим",
-};
+import { useTranslations } from "next-intl";
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/shared/ui/chart";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Legend, Cell } from "recharts";
 
 export default function WareItemPage() {
+  const t = useTranslations("WareItems");
+  const tCommon = useTranslations("Common");
+
   const { data: wareItems, isLoading } = useWareItems();
   const { data: wareTransactions, isLoading: isTransactionsLoading } = useWareTransactions();
   const { data: workerItems } = useWorkers();
@@ -32,6 +33,7 @@ export default function WareItemPage() {
   const updateWareItem = useUpdateWareItem();
   const deleteWareItem = useDeleteWareItem();
   const createWareTransaction = useCreateWareTransaction();
+
   const [filterStock, setFilterStock] = useState<string>("ALL");
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -46,14 +48,7 @@ export default function WareItemPage() {
   });
 
   const MINIMUM_QUANTITY = 10;
-
   const stockOptions = ["ALL", "LOW", "NORMAL"] as const;
-
-  const stockLabels: Record<typeof stockOptions[number], string> = {
-    ALL: "Ҳаммаси",
-    LOW: "Кам миқдор",
-    NORMAL: "Нормал",
-  };
 
   const getWareItemName = (id: string) =>
     Array.isArray(wareItems) ? wareItems.find((item) => item._id === id)?.name ?? id : id;
@@ -113,7 +108,7 @@ export default function WareItemPage() {
   };
 
   const handleDeleteWareItem = async (item: WareItem) => {
-    if (!confirm(`${item.name} маҳсулотини ўчирмоқчимисиз?`)) return;
+    if (!confirm(tCommon("confirmDelete"))) return;
     try {
       await deleteWareItem.mutateAsync(item._id);
     } catch (error) {
@@ -133,11 +128,20 @@ export default function WareItemPage() {
     }
   };
 
+  // Construct stock chart data
+  const stockChartData = useMemo(() => {
+    if (!Array.isArray(wareItems)) return [];
+    return wareItems.map((item) => ({
+      name: item.name,
+      quantity: item.quantity,
+    }));
+  }, [wareItems]);
+
   if (isLoading) {
     return (
       <div className="custom-container space-y-6">
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-semibold tracking-tight text-gray-900">Омбор маҳсулотлари</h1>
+          <h1 className="text-2xl font-semibold tracking-tight text-gray-900">{t("title")}</h1>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {[1, 2, 3, 4, 5, 6].map((i) => (
@@ -148,10 +152,17 @@ export default function WareItemPage() {
     );
   }
 
+  const chartConfig = {
+    quantity: {
+      label: t("quantity"),
+      color: "#6366f1",
+    },
+  };
+
   return (
     <div className="custom-container space-y-8">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold tracking-tight text-gray-900">Омбор маҳсулотлари</h1>
+        <h1 className="text-2xl font-semibold tracking-tight text-gray-900">{t("title")}</h1>
         <div className="flex items-center gap-3">
           <Sheet open={isTransactionSheetOpen} onOpenChange={handleTransactionSheetChange}>
             <SheetTrigger asChild>
@@ -159,17 +170,17 @@ export default function WareItemPage() {
                 type="button"
                 className="flex items-center gap-2 px-3 py-1.5 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors text-sm"
               >
-                Чиқариш
+                {t("addTransaction")}
               </button>
             </SheetTrigger>
             <SheetContent>
               <SheetHeader>
-                <SheetTitle>Маҳсулот чиқариш</SheetTitle>
+                <SheetTitle>{t("transactionTitle")}</SheetTitle>
               </SheetHeader>
               <div className="space-y-4 mt-4">
                 <div>
                   <label className="text-sm font-medium text-gray-700 mb-1 block" htmlFor="transaction-ware-item">
-                    Маҳсулот
+                    {t("product")}
                   </label>
                   <select
                     id="transaction-ware-item"
@@ -177,7 +188,7 @@ export default function WareItemPage() {
                     onChange={(e) => setWareTransaction({ ...wareTransaction, wareItemId: e.target.value })}
                     className="w-full h-8 rounded-lg border border-input bg-transparent px-2.5 py-1 text-sm transition-colors outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
                   >
-                    <option value="">Маҳсулотни танланг</option>
+                    <option value="">{t("selectProduct")}</option>
                     {Array.isArray(wareItems) &&
                       wareItems.map((item) => (
                         <option key={item._id} value={item._id}>
@@ -189,15 +200,15 @@ export default function WareItemPage() {
 
                 <div>
                   <label className="text-sm font-medium text-gray-700 mb-1 block" htmlFor="transaction-quantity">
-                    Миқдор
+                    {t("quantity")}
                   </label>
                   <Input
                     id="transaction-quantity"
-                    value={wareTransaction.quantity.toString()}
+                    value={wareTransaction.quantity || ""}
                     onChange={(e) =>
                       setWareTransaction({ ...wareTransaction, quantity: Number(e.target.value) })
                     }
-                    placeholder="Миқдорни киритинг"
+                    placeholder={t("placeholderQuantity")}
                     type="number"
                     min={1}
                   />
@@ -205,7 +216,7 @@ export default function WareItemPage() {
 
                 <div>
                   <label className="text-sm font-medium text-gray-700 mb-1 block" htmlFor="transaction-worker">
-                    Берилган ишчи
+                    {t("worker")}
                   </label>
                   <select
                     id="transaction-worker"
@@ -213,7 +224,7 @@ export default function WareItemPage() {
                     onChange={(e) => setWareTransaction({ ...wareTransaction, givenToWorker: e.target.value })}
                     className="w-full h-8 rounded-lg border border-input bg-transparent px-2.5 py-1 text-sm transition-colors outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
                   >
-                    <option value="">Ишчини танланг</option>
+                    <option value="">{t("selectWorker")}</option>
                     {Array.isArray(workerItems) &&
                       workerItems.map((item) => (
                         <option key={item._id} value={item._id}>
@@ -234,7 +245,7 @@ export default function WareItemPage() {
                   className="flex items-center gap-2 px-3 py-1.5 bg-black/80 hover:bg-black text-white rounded-lg transition-colors text-sm w-full"
                 >
                   <Check className="w-4 h-4" />
-                  <span>{createWareTransaction.isPending ? "Сақланмоқда..." : "Сақлаш"}</span>
+                  <span>{createWareTransaction.isPending ? tCommon("save") + "..." : tCommon("save")}</span>
                 </Button>
               </div>
             </SheetContent>
@@ -247,33 +258,33 @@ export default function WareItemPage() {
                 className="flex items-center gap-2 px-3 py-1.5 bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg transition-colors text-sm"
               >
                 <Plus className="w-4 h-4" />
-                <span>Қўшиш</span>
+                <span>{tCommon("add")}</span>
               </button>
             </SheetTrigger>
             <SheetContent>
               <SheetHeader>
-                <SheetTitle>Янги маҳсулот қўшиш</SheetTitle>
+                <SheetTitle>{t("addTitle")}</SheetTitle>
               </SheetHeader>
               <div className="space-y-4 mt-4">
                 <div>
-                  <label className="text-sm font-medium text-gray-700 mb-1 block">Маҳсулот номи</label>
+                  <label className="text-sm font-medium text-gray-700 mb-1 block">{t("product")}</label>
                   <Input
                     value={newWareItem.name}
                     onChange={(e) => setNewWareItem({ ...newWareItem, name: e.target.value })}
-                    placeholder="Маҳсулот номини киритинг"
+                    placeholder={t("placeholderName")}
                   />
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-700 mb-1 block">Миқдор</label>
+                  <label className="text-sm font-medium text-gray-700 mb-1 block">{t("quantity")}</label>
                   <Input
-                    value={newWareItem.quantity.toString()}
+                    value={newWareItem.quantity || ""}
                     onChange={(e) => setNewWareItem({ ...newWareItem, quantity: Number(e.target.value) })}
-                    placeholder="Миқдорни киритинг"
+                    placeholder={t("placeholderQuantity")}
                     type="number"
                   />
                 </div>
                 <Button onClick={handleAddWareItem} className="w-full">
-                  Қўшиш
+                  {tCommon("add")}
                 </Button>
               </div>
             </SheetContent>
@@ -281,31 +292,64 @@ export default function WareItemPage() {
         </div>
       </div>
 
+      {/* Stock Levels Chart */}
+      {stockChartData.length > 0 && (
+        <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">{t("chartStock")}</h2>
+          <div className="h-64">
+            <ChartContainer config={chartConfig} className="w-full h-full">
+              <BarChart
+                data={stockChartData}
+                margin={{ top: 10, right: 10, left: 10, bottom: 0 }}
+              >
+                <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" vertical={false} />
+                <XAxis dataKey="name" stroke="#9ca3af" fontSize={11} tickLine={false} />
+                <YAxis
+                  stroke="#9ca3af"
+                  fontSize={11}
+                  tickLine={false}
+                  axisLine={false}
+                />
+                <ChartTooltip content={<ChartTooltipContent />} />
+                <Bar dataKey="quantity" name={t("quantity")} fill="#6366f1" radius={[4, 4, 0, 0]}>
+                  {stockChartData.map((entry, index) => (
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={entry.quantity <= MINIMUM_QUANTITY ? "#ef4444" : "#6366f1"}
+                    />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ChartContainer>
+          </div>
+        </div>
+      )}
+
       <Sheet open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
         <SheetContent>
           <SheetHeader>
-            <SheetTitle>Маҳсулотни таҳрирлаш</SheetTitle>
+            <SheetTitle>{t("editTitle")}</SheetTitle>
           </SheetHeader>
           <div className="space-y-4 mt-4">
             <div>
-              <label className="text-sm font-medium text-gray-700 mb-1 block">Маҳсулот номи</label>
+              <label className="text-sm font-medium text-gray-700 mb-1 block">{t("product")}</label>
               <Input
                 value={newWareItem.name}
                 onChange={(e) => setNewWareItem({ ...newWareItem, name: e.target.value })}
-                placeholder="Маҳсулот номини киритинг"
+                placeholder={t("placeholderName")}
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-gray-700 mb-1 block">Миқдор</label>
+              <label className="text-sm font-medium text-gray-700 mb-1 block">{t("quantity")}</label>
               <Input
-                value={newWareItem.quantity.toString()}
+                value={newWareItem.quantity || ""}
                 onChange={(e) => setNewWareItem({ ...newWareItem, quantity: Number(e.target.value) })}
-                placeholder="Миқдорни киритинг"
+                placeholder={t("placeholderQuantity")}
                 type="number"
               />
             </div>
             <Button onClick={handleUpdateWareItem} className="w-full">
-              Сақлаш
+              {tCommon("save")}
             </Button>
           </div>
         </SheetContent>
@@ -324,7 +368,7 @@ export default function WareItemPage() {
                   : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"
               }`}
             >
-              {stockLabels[status]}
+              {status === "ALL" ? tCommon("all") : t(`${status.toLowerCase()}Stock`)}
             </button>
           ))}
         </div>
@@ -347,15 +391,15 @@ export default function WareItemPage() {
                         <button
                           type="button"
                           className="text-gray-400 hover:text-gray-600 transition-colors"
-                          aria-label="Меню"
+                          aria-label="Menu"
                         >
                           <MoreVertical className="w-5 h-5" />
                         </button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem onSelect={() => handleEditWareItem(item)}>Таҳрирлаш</DropdownMenuItem>
+                        <DropdownMenuItem onSelect={() => handleEditWareItem(item)}>{tCommon("edit")}</DropdownMenuItem>
                         <DropdownMenuItem variant="destructive" onSelect={() => handleDeleteWareItem(item)}>
-                          Ўчириш
+                          {tCommon("delete")}
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
@@ -363,13 +407,13 @@ export default function WareItemPage() {
                   <h3 className="font-semibold text-gray-900">{item.name}</h3>
                   <div className="mt-4 pt-4 border-t border-gray-100">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm text-gray-500">Миқдор</span>
+                      <span className="text-sm text-gray-500">{t("quantity")}</span>
                       <span className="font-mono text-lg font-semibold text-gray-900">{item.quantity}</span>
                     </div>
                     {isLowStock && (
                       <div className="flex items-center gap-2 text-xs text-red-600">
                         <AlertTriangle className="w-3.5 h-3.5" />
-                        <span>Кам миқдор</span>
+                        <span>{t("lowStock")}</span>
                       </div>
                     )}
                   </div>
@@ -379,8 +423,8 @@ export default function WareItemPage() {
           </div>
         ) : (
           <EmptyState
-            title="Маҳсулотлар топилмади"
-            description="Ҳозирча ҳеч қандай махсулот қоʻшилмаган"
+            title={tCommon("empty")}
+            description=""
           />
         )}
       </section>
@@ -388,7 +432,7 @@ export default function WareItemPage() {
       <section className="space-y-4">
         <div className="flex items-center gap-2">
           <ArrowDownUp className="w-5 h-5 text-gray-500" />
-          <h2 className="text-xl font-semibold text-gray-900">Омбор транзаксиялар</h2>
+          <h2 className="text-xl font-semibold text-gray-900">{t("recentWareTransactions")}</h2>
         </div>
 
         {isTransactionsLoading ? (
@@ -403,11 +447,11 @@ export default function WareItemPage() {
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-gray-200 bg-gray-50 text-xs text-gray-500 uppercase tracking-wider">
-                    <th className="py-3 px-6 text-left">Махсулот</th>
-                    <th className="py-3 px-6 text-left">Миқдор</th>
-                    <th className="py-3 px-6 text-left">Тури</th>
-                    <th className="py-3 px-6 text-left">Берилган ишчи</th>
-                    <th className="py-3 px-6 text-left">Сана</th>
+                    <th className="py-3 px-6 text-left">{t("product")}</th>
+                    <th className="py-3 px-6 text-left">{t("quantity")}</th>
+                    <th className="py-3 px-6 text-left">{t("type")}</th>
+                    <th className="py-3 px-6 text-left">{t("worker")}</th>
+                    <th className="py-3 px-6 text-left">Sana</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -425,7 +469,7 @@ export default function WareItemPage() {
                               : "bg-red-100 text-red-700 border-red-200"
                           }`}
                         >
-                          {transactionTypeLabels[transaction.type]}
+                          {t(`types.${transaction.type}`)}
                         </span>
                       </td>
                       <td className="py-3.5 px-6 text-sm text-gray-900">
@@ -446,8 +490,8 @@ export default function WareItemPage() {
           </div>
         ) : (
           <EmptyState
-            title="Транзаксиялар топилмади"
-            description="Ҳозирча ҳеч қандай омбор транзаксияси йоʻқ"
+            title={tCommon("empty")}
+            description=""
           />
         )}
       </section>

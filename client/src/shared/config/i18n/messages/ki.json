@@ -1,6 +1,190 @@
 {
-  "HomePage": {
-    "title": "Salom dunyo! (Kiril)",
-    "about": "Go to the about page"
+  "Navbar": {
+    "dashboard": "Бош саҳифа",
+    "worker": "Ишчилар",
+    "team": "Жамоалар",
+    "machine": "Машиналар",
+    "well": "Қудуқлар",
+    "wareitem": "Маҳсулотлар",
+    "purchase": "Харидлар",
+    "transaction": "Транзакциялар"
+  },
+  "Dashboard": {
+    "title": "Бош саҳифа",
+    "monthlyIncome": "Ойлик Кирим",
+    "monthlyOutcome": "Ойлик Чиқим",
+    "transactions": "{count} та транзакция",
+    "incomeVsOutcome": "Сўнгги 6 ой — Даромад vs Харажат",
+    "income": "Даромад",
+    "outcome": "Харажат",
+    "wellStatusDistribution": "Қудуқлар ҳолати тақсимоти",
+    "wareitemStockDistribution": "Омбордаги маҳсулотлар миқдори",
+    "recentWareTransactions": "Охирги Омбор Транзакциялари",
+    "product": "Маҳсулот",
+    "quantity": "Миқдор",
+    "type": "Тур",
+    "date": "Сана",
+    "loading": "Юкланмоқда..."
+  },
+  "Workers": {
+    "title": "Ишчилар",
+    "addWorker": "Ишchi қўшиш",
+    "name": "Исм",
+    "phone": "Телефон",
+    "team": "Жамоа",
+    "position": "Лавозим",
+    "actions": "Амаллар",
+    "all": "Ҳаммаси",
+    "addTitle": "Янги ишчи қўшиш",
+    "editTitle": "Ишчини таҳрирлаш",
+    "placeholderName": "Исмни киритинг",
+    "placeholderPhone": "+998 90 123 45 67",
+    "selectTeam": "Жамоани танланг",
+    "selectPosition": "Лавозимни танланг",
+    "positions": {
+      "DRIVER": "Ҳайдовчи",
+      "OPERATOR": "Оператор",
+      "WORKER": "Ишчи",
+      "SUPERVISOR": "Назоратчи",
+      "MASTER": "Уста"
+    }
+  },
+  "Teams": {
+    "title": "Жамоалар",
+    "addTeam": "Жамоа қўшиш",
+    "name": "Жамоа номи",
+    "machine": "Машина",
+    "workersCount": "Ишчилар сони",
+    "actions": "Амаллар",
+    "addTitle": "Янги жамоа қўшиш",
+    "editTitle": "Жамоани таҳрирлаш",
+    "placeholderName": "Жамоа номини киритинг",
+    "selectMachine": "Машинани танланг"
+  },
+  "Machines": {
+    "title": "Машиналар",
+    "addMachine": "Машина қўшиш",
+    "number": "Машина рақами",
+    "team": "Жамоа",
+    "status": "Ҳолати",
+    "actions": "Амаллар",
+    "all": "Ҳаммаси",
+    "addTitle": "Янги машина қўшиш",
+    "editTitle": "Машинани таҳрирлаш",
+    "placeholderNumber": "Машина рақамини киритинг",
+    "selectTeam": "Жамоани танланг",
+    "selectStatus": "Ҳолатни танланг",
+    "wellsCount": "{count} та қудуқ қазилган",
+    "statuses": {
+      "ACTIVE": "Фаол",
+      "REPAIRING": "Таъмирда"
+    }
+  },
+  "Wells": {
+    "title": "Қудуқлар",
+    "addWell": "Қудуқ қўшиш",
+    "team": "Жамоа",
+    "expectedLength": "Кутилаётган узунлик",
+    "length": "Узунлик",
+    "status": "Ҳолати",
+    "actions": "Амаллар",
+    "all": "Ҳаммаси",
+    "addTitle": "Янги қудуқ қўшиш",
+    "editTitle": "Қудуқни таҳрирлаш",
+    "placeholderExpectedLength": "Кутилаётган узунликни киритинг (м)",
+    "selectTeam": "Жамоани танланг",
+    "selectStatus": "Ҳолатни танланг",
+    "chartProgress": "Кутилаётган vs Ҳақиқий Узунлик (м)",
+    "chartExpected": "Кутилаётган",
+    "chartActual": "Ҳақиқий",
+    "statuses": {
+      "DUGGING": "Қазилмоқда",
+      "FINISHED": "Тугалланган",
+      "SUCCESSFUL": "Муваффақиятли",
+      "FAILED": "Муваффақиятсиз"
+    }
+  },
+  "WareItems": {
+    "title": "Омбор маҳсулотлари",
+    "addWareItem": "Маҳсулот қўшиш",
+    "addTransaction": "Транзакция қўшиш",
+    "product": "Маҳсулот",
+    "quantity": "Миқдор",
+    "actions": "Амаллар",
+    "all": "Ҳаммаси",
+    "lowStock": "Кам миқдор",
+    "normalStock": "Нормал",
+    "addTitle": "Янги маҳсулот қўшиш",
+    "editTitle": "Маҳсулотни таҳрирлаш",
+    "placeholderName": "Маҳсулот номини киритинг",
+    "placeholderQuantity": "Миқдорни киритинг",
+    "transactionTitle": "Омбор транзакцияси қўшиш",
+    "worker": "Ходим",
+    "selectProduct": "Маҳсулотни танланг",
+    "selectWorker": "Ходимни танланг",
+    "transactionType": "Транзакция тури",
+    "chartStock": "Омбор захиралари миқдори",
+    "types": {
+      "INCOME": "Кирим",
+      "OUTCOME": "Чиқим"
+    }
+  },
+  "Purchases": {
+    "title": "Харидлар",
+    "addPurchase": "Харид қўшиш",
+    "name": "Номи",
+    "quantity": "Сони",
+    "price": "Нархи",
+    "type": "Тури",
+    "note": "Эслатма",
+    "actions": "Амаллар",
+    "totalCost": "Жами Харажатлар",
+    "addTitle": "Янги харид қўшиш",
+    "editTitle": "Харидни таҳрирлаш",
+    "placeholderName": "Маҳсулот номини киритинг",
+    "placeholderQuantity": "Сонини киритинг",
+    "placeholderPrice": "Нархини киритинг",
+    "placeholderNote": "Эслатма киритинг",
+    "types": {
+      "INCOME": "Сотиб олинди",
+      "OUTCOME": "Сотилди"
+    }
+  },
+  "Transactions": {
+    "title": "Транзакциялар",
+    "addTransaction": "Транзакция қўшиш",
+    "amount": "Қиймат",
+    "type": "Тури",
+    "currency": "Пул тури",
+    "note": "Эслатма",
+    "actions": "Амаллар",
+    "totalIncome": "Жами Кирим",
+    "totalOutcome": "Жами Чиқим",
+    "addTitle": "Янги транзакция қўшиш",
+    "editTitle": "Транзакцияни таҳрирлаш",
+    "placeholderAmount": "Қийматни киритинг",
+    "placeholderNote": "Эслатма киритинг",
+    "selectType": "Турини танланг",
+    "selectCurrency": "Валютани танланг",
+    "chartFlow": "Транзакциялар ҳаракати",
+    "types": {
+      "INCOME": "Кирим",
+      "OUTCOME": "Чиқим"
+    },
+    "currencies": {
+      "USD": "Доллар",
+      "UZS": "Ўзбек сўми"
+    }
+  },
+  "Common": {
+    "add": "Қўшиш",
+    "save": "Сақлаш",
+    "edit": "Таҳрирлаш",
+    "delete": "Ўчириш",
+    "cancel": "Бекор қилиш",
+    "empty": "Ҳозирча ҳеч қандай маълумот қўшилмаган",
+    "confirmDelete": "Ўчиришни тасдиқлайсизми?",
+    "success": "Муваффақиятли",
+    "error": "Хатолик юз берди"
   }
 }

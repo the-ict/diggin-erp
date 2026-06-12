@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Phone, MoreVertical, Plus, X } from "lucide-react";
+import { Phone, MoreVertical, Plus } from "lucide-react";
 import { useWorkers, useCreateWorker, useUpdateWorker, useDeleteWorker } from "@/shared/lib/hooks/use-workers";
 import { useTeams } from "@/shared/lib/hooks/use-teams";
 import { SkeletonCard } from "@/shared/ui/SkeletonCard";
@@ -16,13 +16,18 @@ import { Worker, WorkerPosition } from "@/shared/config/api/worker.model";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/shared/ui/sheet";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
+import { useTranslations } from "next-intl";
 
 export default function WorkerPage() {
+  const t = useTranslations("Workers");
+  const tCommon = useTranslations("Common");
+
   const { data: workers, isLoading } = useWorkers();
   const { data: teams } = useTeams();
   const createWorker = useCreateWorker();
   const updateWorker = useUpdateWorker();
   const deleteWorker = useDeleteWorker();
+
   const [filterPosition, setFilterPosition] = useState<string>("ALL");
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -34,15 +39,6 @@ export default function WorkerPage() {
   ) : [];
 
   const positions: (WorkerPosition | "ALL")[] = ["ALL", "DRIVER", "OPERATOR", "WORKER", "SUPERVISOR", "MASTER"];
-
-  const positionLabels: Record<WorkerPosition | "ALL", string> = {
-    "ALL": "Ҳаммаси",
-    "DRIVER": "Ҳайдовчи",
-    "OPERATOR": "Оператор",
-    "WORKER": "Ишчи",
-    "SUPERVISOR": "Назоратчи",
-    "MASTER": "Уста"
-  };
 
   const handleAddWorker = async () => {
     try {
@@ -73,7 +69,7 @@ export default function WorkerPage() {
   };
 
   const handleDeleteWorker = async (worker: Worker) => {
-    if (!confirm(`${worker.name} ишчисини ўчирмоқчимисиз?`)) return;
+    if (!confirm(tCommon("confirmDelete"))) return;
     try {
       await deleteWorker.mutateAsync(worker._id);
     } catch (error) {
@@ -85,7 +81,7 @@ export default function WorkerPage() {
     return (
       <div className="custom-container space-y-6">
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-semibold tracking-tight text-gray-900">Ишчилар</h1>
+          <h1 className="text-2xl font-semibold tracking-tight text-gray-900">{t("title")}</h1>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {[1, 2, 3, 4, 5, 6].map(i => <SkeletonCard key={i} />)}
@@ -97,64 +93,62 @@ export default function WorkerPage() {
   return (
     <div className="custom-container space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold tracking-tight text-gray-900">Ишчилар</h1>
+        <h1 className="text-2xl font-semibold tracking-tight text-gray-900">{t("title")}</h1>
         <Sheet open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
           <SheetTrigger asChild>
             <button className="flex items-center gap-2 px-3 py-1.5 bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg transition-colors text-sm">
               <Plus className="w-4 h-4" />
-              <span>Qo'shish</span>
+              <span>{tCommon("add")}</span>
             </button>
           </SheetTrigger>
           <SheetContent>
             <SheetHeader>
-              <SheetTitle>Янги ишчи қўшиш</SheetTitle>
+              <SheetTitle>{t("addTitle")}</SheetTitle>
             </SheetHeader>
             <div className="space-y-4 mt-4">
               <div>
-                <label className="text-sm font-medium text-gray-700 mb-1 block">Исм</label>
+                <label className="text-sm font-medium text-gray-700 mb-1 block">{t("name")}</label>
                 <Input
                   value={newWorker.name}
                   onChange={(e) => setNewWorker({ ...newWorker, name: e.target.value })}
-                  placeholder="Исмни киритинг"
+                  placeholder={t("placeholderName")}
                 />
               </div>
               <div>
-                <label className="text-sm font-medium text-gray-700 mb-1 block">Телефон</label>
+                <label className="text-sm font-medium text-gray-700 mb-1 block">{t("phone")}</label>
                 <Input
                   value={newWorker.phone}
                   onChange={(e) => setNewWorker({ ...newWorker, phone: e.target.value })}
-                  placeholder="+998 90 123 45 67"
+                  placeholder={t("placeholderPhone")}
                 />
               </div>
               <div>
-                <label className="text-sm font-medium text-gray-700 mb-1 block">Жамоа</label>
+                <label className="text-sm font-medium text-gray-700 mb-1 block">{t("team")}</label>
                 <select
                   value={newWorker.teamId}
                   onChange={(e) => setNewWorker({ ...newWorker, teamId: e.target.value })}
                   className="w-full h-8 rounded-lg border border-input bg-transparent px-2.5 py-1 text-sm transition-colors outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
                 >
-                  <option value="">Жамоани танланг</option>
+                  <option value="">{t("selectTeam")}</option>
                   {Array.isArray(teams) && teams.map(team => (
                     <option key={team._id} value={team._id}>{team.name}</option>
                   ))}
                 </select>
               </div>
               <div>
-                <label className="text-sm font-medium text-gray-700 mb-1 block">Лавозим</label>
+                <label className="text-sm font-medium text-gray-700 mb-1 block">{t("position")}</label>
                 <select
                   value={newWorker.position}
                   onChange={(e) => setNewWorker({ ...newWorker, position: e.target.value as WorkerPosition })}
                   className="w-full h-8 rounded-lg border border-input bg-transparent px-2.5 py-1 text-sm transition-colors outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
                 >
-                  <option value="WORKER">Ишчи</option>
-                  <option value="DRIVER">Ҳайдовчи</option>
-                  <option value="OPERATOR">Оператор</option>
-                  <option value="SUPERVISOR">Назоратчи</option>
-                  <option value="MASTER">Уста</option>
+                  {positions.filter(pos => pos !== "ALL").map(pos => (
+                    <option key={pos} value={pos}>{t(`positions.${pos}`)}</option>
+                  ))}
                 </select>
               </div>
               <Button onClick={handleAddWorker} className="w-full">
-                Қўшиш
+                {tCommon("add")}
               </Button>
             </div>
           </SheetContent>
@@ -164,54 +158,52 @@ export default function WorkerPage() {
         <Sheet open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
           <SheetContent>
             <SheetHeader>
-              <SheetTitle>Ишчини таҳрирлаш</SheetTitle>
+              <SheetTitle>{t("editTitle")}</SheetTitle>
             </SheetHeader>
             <div className="space-y-4 mt-4">
               <div>
-                <label className="text-sm font-medium text-gray-700 mb-1 block">Исм</label>
+                <label className="text-sm font-medium text-gray-700 mb-1 block">{t("name")}</label>
                 <Input
                   value={newWorker.name}
                   onChange={(e) => setNewWorker({ ...newWorker, name: e.target.value })}
-                  placeholder="Исмни киритинг"
+                  placeholder={t("placeholderName")}
                 />
               </div>
               <div>
-                <label className="text-sm font-medium text-gray-700 mb-1 block">Телефон</label>
+                <label className="text-sm font-medium text-gray-700 mb-1 block">{t("phone")}</label>
                 <Input
                   value={newWorker.phone}
                   onChange={(e) => setNewWorker({ ...newWorker, phone: e.target.value })}
-                  placeholder="+998 90 123 45 67"
+                  placeholder={t("placeholderPhone")}
                 />
               </div>
               <div>
-                <label className="text-sm font-medium text-gray-700 mb-1 block">Жамоа</label>
+                <label className="text-sm font-medium text-gray-700 mb-1 block">{t("team")}</label>
                 <select
                   value={newWorker.teamId}
                   onChange={(e) => setNewWorker({ ...newWorker, teamId: e.target.value })}
                   className="w-full h-8 rounded-lg border border-input bg-transparent px-2.5 py-1 text-sm transition-colors outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
                 >
-                  <option value="">Жамоани танланг</option>
+                  <option value="">{t("selectTeam")}</option>
                   {Array.isArray(teams) && teams.map(team => (
                     <option key={team._id} value={team._id}>{team.name}</option>
                   ))}
                 </select>
               </div>
               <div>
-                <label className="text-sm font-medium text-gray-700 mb-1 block">Лавозим</label>
+                <label className="text-sm font-medium text-gray-700 mb-1 block">{t("position")}</label>
                 <select
                   value={newWorker.position}
                   onChange={(e) => setNewWorker({ ...newWorker, position: e.target.value as WorkerPosition })}
                   className="w-full h-8 rounded-lg border border-input bg-transparent px-2.5 py-1 text-sm transition-colors outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
                 >
-                  <option value="WORKER">Ишчи</option>
-                  <option value="DRIVER">Ҳайдовчи</option>
-                  <option value="OPERATOR">Оператор</option>
-                  <option value="SUPERVISOR">Назоратчи</option>
-                  <option value="MASTER">Уста</option>
+                  {positions.filter(pos => pos !== "ALL").map(pos => (
+                    <option key={pos} value={pos}>{t(`positions.${pos}`)}</option>
+                  ))}
                 </select>
               </div>
               <Button onClick={handleUpdateWorker} className="w-full">
-                Сақлаш
+                {tCommon("save")}
               </Button>
             </div>
           </SheetContent>
@@ -230,7 +222,7 @@ export default function WorkerPage() {
                 : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"
             }`}
           >
-            {position}
+            {position === "ALL" ? t("all") : t(`positions.${position}`)}
           </button>
         ))}
       </div>
@@ -253,14 +245,14 @@ export default function WorkerPage() {
                     </button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent>
-                    <DropdownMenuItem onClick={() => handleEditWorker(worker)}>Таҳрирлаш</DropdownMenuItem>
-                    <DropdownMenuItem className="text-red-600" onClick={() => handleDeleteWorker(worker)}>Ўчириш</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleEditWorker(worker)}>{tCommon("edit")}</DropdownMenuItem>
+                    <DropdownMenuItem className="text-red-600" onClick={() => handleDeleteWorker(worker)}>{tCommon("delete")}</DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>
               <h3 className="font-semibold text-gray-900 mb-1">{worker.name}</h3>
               <span className="text-xs px-2 py-0.5 rounded-full border bg-indigo-100 text-indigo-600 border-indigo-200">
-                {positionLabels[worker.position]}
+                {t(`positions.${worker.position}`)}
               </span>
               <div className="flex items-center gap-2 mt-3 text-sm text-gray-500">
                 <Phone className="w-3.5 h-3.5" />
@@ -271,8 +263,8 @@ export default function WorkerPage() {
         </div>
       ) : (
         <EmptyState
-          title="Ishchilar topilmadi"
-          description="Hozircha hech qanday ishchi qo'shilmagan"
+          title={tCommon("empty")}
+          description=""
         />
       )}
     </div>

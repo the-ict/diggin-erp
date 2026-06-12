@@ -10,8 +10,12 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/sh
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/shared/ui/dropdown-menu";
+import { useTranslations } from "next-intl";
 
 export default function PurchasePage() {
+  const t = useTranslations("Purchases");
+  const tCommon = useTranslations("Common");
+
   const { data: purchases, isLoading } = usePurchases();
   const createPurchase = useCreatePurchase();
   const updatePurchase = useUpdatePurchase();
@@ -33,8 +37,6 @@ export default function PurchasePage() {
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('uz-UZ').format(amount);
   };
-
-  console.log("purchases: ", purchases);
 
   const handleAddPurchase = async () => {
     try {
@@ -63,6 +65,7 @@ export default function PurchasePage() {
   };
 
   const handleDeletePurchase = async (purchase: Purchase) => {
+    if (!confirm(tCommon("confirmDelete"))) return;
     try {
       await deletePurchase.mutateAsync(purchase._id);
     } catch (error) {
@@ -74,7 +77,7 @@ export default function PurchasePage() {
     return (
       <div className="custom-container space-y-6">
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-semibold tracking-tight text-gray-900">Харидлар</h1>
+          <h1 className="text-2xl font-semibold tracking-tight text-gray-900">{t("title")}</h1>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {[1, 2, 3, 4, 5, 6].map(i => <SkeletonCard key={i} />)}
@@ -86,34 +89,44 @@ export default function PurchasePage() {
   return (
     <div className="custom-container space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold tracking-tight text-gray-900">Харидлар</h1>
+        <h1 className="text-2xl font-semibold tracking-tight text-gray-900">{t("title")}</h1>
         <Sheet open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
           <SheetTrigger asChild>
             <button className="flex items-center gap-2 px-3 py-1.5 bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg transition-colors text-sm">
               <Plus className="w-4 h-4" />
-              <span>Qo'shish</span>
+              <span>{tCommon("add")}</span>
             </button>
           </SheetTrigger>
           <SheetContent>
             <SheetHeader>
-              <SheetTitle>Янги xarid қўшиш</SheetTitle>
+              <SheetTitle>{t("addTitle")}</SheetTitle>
             </SheetHeader>
             <div className="space-y-4 mt-4 text-[16px]">
-              <label>Maxsulot nomini kiritng</label>
-              <Input placeholder="Nomi" className="mt-1" onChange={(e) => { setNewPurchase({ ...newPurchase, name: e.target.value }) }} />
-              <label>Sonini kiriting</label>
-              <Input placeholder="Soni" className="mt-1" type="number" onChange={(e) => { setNewPurchase({ ...newPurchase, quantity: Number(e.target.value) }) }} />
-              <label>Xarid turi</label>
-              <select name="purchase_type" className="block mt-1 w-full h-8 rounded-lg border border-input bg-transparent px-2.5 py-1 text-sm transition-colors outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50" onChange={(e) => setNewPurchase({ ...newPurchase, type: e.target.value as "INCOME" | "OUTCOME" })} id="">
-                <option value="INCOME">Sotib olindi</option>
-                <option value="OUTCOME">Sotildi</option>
-              </select>
-              <label>Narxi</label>
-              <Input placeholder="Narxi" className="mt-1" onChange={(e) => setNewPurchase({ ...newPurchase, price: Number(e.target.value) })} type="number" />
-              <label>Eslatma</label>
-              <Input placeholder="Eslatma" className="mt-1" onChange={(e) => setNewPurchase({ ...newPurchase, note: e.target.value })} />
+              <div>
+                <label className="text-sm font-medium text-gray-700 mb-1 block">{t("name")}</label>
+                <Input placeholder={t("placeholderName")} className="mt-1" onChange={(e) => { setNewPurchase({ ...newPurchase, name: e.target.value }) }} />
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-700 mb-1 block">{t("quantity")}</label>
+                <Input placeholder={t("placeholderQuantity")} className="mt-1" type="number" onChange={(e) => { setNewPurchase({ ...newPurchase, quantity: Number(e.target.value) }) }} />
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-700 mb-1 block">{t("type")}</label>
+                <select name="purchase_type" className="block mt-1 w-full h-8 rounded-lg border border-input bg-transparent px-2.5 py-1 text-sm transition-colors outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50" onChange={(e) => setNewPurchase({ ...newPurchase, type: e.target.value as "INCOME" | "OUTCOME" })} id="">
+                  <option value="INCOME">{t("types.INCOME")}</option>
+                  <option value="OUTCOME">{t("types.OUTCOME")}</option>
+                </select>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-700 mb-1 block">{t("price")}</label>
+                <Input placeholder={t("placeholderPrice")} className="mt-1" onChange={(e) => setNewPurchase({ ...newPurchase, price: Number(e.target.value) })} type="number" />
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-700 mb-1 block">{t("note")}</label>
+                <Input placeholder={t("placeholderNote")} className="mt-1" onChange={(e) => setNewPurchase({ ...newPurchase, note: e.target.value })} />
+              </div>
               <Button onClick={handleAddPurchase} className="w-full">
-                Қўшиш
+                {tCommon("add")}
               </Button>
             </div>
           </SheetContent>
@@ -122,24 +135,34 @@ export default function PurchasePage() {
         <Sheet open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
           <SheetContent>
             <SheetHeader>
-              <SheetTitle>Xaridni tahrirlash</SheetTitle>
+              <SheetTitle>{t("editTitle")}</SheetTitle>
             </SheetHeader>
             <div className="space-y-4 mt-4 text-[16px]">
-              <label>Maxsulot nomi</label>
-              <Input placeholder="Nomi" className="mt-1" value={newPurchase.name} onChange={(e) => { setNewPurchase({ ...newPurchase, name: e.target.value }) }} />
-              <label>Sonini kiriting</label>
-              <Input placeholder="Soni" className="mt-1" type="number" value={newPurchase.quantity} onChange={(e) => { setNewPurchase({ ...newPurchase, quantity: Number(e.target.value) }) }} />
-              <label>Xarid turi</label>
-              <select name="purchase_type" value={newPurchase.type} className="block mt-1 w-full h-8 rounded-lg border border-input bg-transparent px-2.5 py-1 text-sm transition-colors outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50" onChange={(e) => setNewPurchase({ ...newPurchase, type: e.target.value as "INCOME" | "OUTCOME" })} id="">
-                <option value="INCOME">Sotib olindi</option>
-                <option value="OUTCOME">Sotildi</option>
-              </select>
-              <label>Narxi</label>
-              <Input placeholder="Narxi" className="mt-1" value={newPurchase.price} onChange={(e) => setNewPurchase({ ...newPurchase, price: Number(e.target.value) })} type="number" />
-              <label>Eslatma</label>
-              <Input placeholder="Eslatma" className="mt-1" value={newPurchase.note} onChange={(e) => setNewPurchase({ ...newPurchase, note: e.target.value })} />
+              <div>
+                <label className="text-sm font-medium text-gray-700 mb-1 block">{t("name")}</label>
+                <Input placeholder={t("placeholderName")} className="mt-1" value={newPurchase.name} onChange={(e) => { setNewPurchase({ ...newPurchase, name: e.target.value }) }} />
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-700 mb-1 block">{t("quantity")}</label>
+                <Input placeholder={t("placeholderQuantity")} className="mt-1" type="number" value={newPurchase.quantity} onChange={(e) => { setNewPurchase({ ...newPurchase, quantity: Number(e.target.value) }) }} />
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-700 mb-1 block">{t("type")}</label>
+                <select name="purchase_type" value={newPurchase.type} className="block mt-1 w-full h-8 rounded-lg border border-input bg-transparent px-2.5 py-1 text-sm transition-colors outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50" onChange={(e) => setNewPurchase({ ...newPurchase, type: e.target.value as "INCOME" | "OUTCOME" })} id="">
+                  <option value="INCOME">{t("types.INCOME")}</option>
+                  <option value="OUTCOME">{t("types.OUTCOME")}</option>
+                </select>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-700 mb-1 block">{t("price")}</label>
+                <Input placeholder={t("placeholderPrice")} className="mt-1" value={newPurchase.price} onChange={(e) => setNewPurchase({ ...newPurchase, price: Number(e.target.value) })} type="number" />
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-700 mb-1 block">{t("note")}</label>
+                <Input placeholder={t("placeholderNote")} className="mt-1" value={newPurchase.note} onChange={(e) => setNewPurchase({ ...newPurchase, note: e.target.value })} />
+              </div>
               <Button onClick={handleUpdatePurchase} className="w-full">
-                O'zgartirish
+                {tCommon("save")}
               </Button>
             </div>
           </SheetContent>
@@ -153,7 +176,7 @@ export default function PurchasePage() {
             <DollarSign className="w-5 h-5 text-green-600" />
           </div>
           <div>
-            <p className="text-sm text-gray-500">Jami xarajat</p>
+            <p className="text-sm text-gray-500">{t("totalCost")}</p>
             <p className="text-2xl font-mono font-semibold text-green-600">{formatCurrency(totalCost)} UZS</p>
           </div>
         </div>
@@ -165,13 +188,13 @@ export default function PurchasePage() {
           <table className="w-full">
             <thead>
               <tr className="border-b border-gray-200 text-xs text-gray-500 uppercase tracking-wider">
-                <th className="pb-3 text-left px-6">Nomi</th>
-                <th className="pb-3 text-left px-6">Miqdor</th>
-                <th className="pb-3 text-left px-6">Narxi</th>
-                <th className="pb-3 text-left px-6">Jami</th>
-                <th className="pb-3 text-left px-6">Izoh</th>
+                <th className="pb-3 text-left px-6">{t("name")}</th>
+                <th className="pb-3 text-left px-6">{t("quantity")}</th>
+                <th className="pb-3 text-left px-6">{t("price")}</th>
+                <th className="pb-3 text-left px-6">{tCommon("add")}</th>
+                <th className="pb-3 text-left px-6">{t("note")}</th>
                 <th className="pb-3 text-left px-6">Sana</th>
-                <th className="pb-3 text-right px-6">Amallar</th>
+                <th className="pb-3 text-right px-6">{t("actions")}</th>
               </tr>
             </thead>
             <tbody>
@@ -203,8 +226,8 @@ export default function PurchasePage() {
                             type: purchase.type,
                             note: purchase.note || "",
                           });
-                        }}>Таҳрирлаш</DropdownMenuItem>
-                        <DropdownMenuItem className="text-red-600" onClick={() => handleDeletePurchase(purchase)}>Ўчириш</DropdownMenuItem>
+                        }}>{tCommon("edit")}</DropdownMenuItem>
+                        <DropdownMenuItem className="text-red-600" onClick={() => handleDeletePurchase(purchase)}>{tCommon("delete")}</DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </td>
@@ -215,8 +238,8 @@ export default function PurchasePage() {
         </div>
       ) : (
         <EmptyState
-          title="Haridlar topilmadi"
-          description="Hozircha hech qanday xarid qo'shilmagan"
+          title={tCommon("empty")}
+          description=""
         />
       )}
     </div>

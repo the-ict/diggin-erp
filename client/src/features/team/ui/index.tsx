@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Users, Truck, MapPin, MoreVertical, Plus } from "lucide-react";
+import { Users, Truck, MoreVertical, Plus } from "lucide-react";
 import { useTeams, useCreateTeam, useUpdateTeam, useDeleteTeam } from "@/shared/lib/hooks/use-teams";
 import { useWorkers } from "@/shared/lib/hooks/use-workers";
 import { useMachines } from "@/shared/lib/hooks/use-machines";
@@ -16,18 +16,23 @@ import {
 } from "@/shared/ui/dropdown-menu";
 import { Team } from "@/shared/config/api/team.model";
 import { Worker } from "@/shared/config/api/worker.model";
-import { Machine } from "@/shared/config/api/machine.model";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/shared/ui/sheet";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
+import { useTranslations } from "next-intl";
 
 export default function TeamPage() {
+  const t = useTranslations("Teams");
+  const tCommon = useTranslations("Common");
+  const tWorkers = useTranslations("Workers");
+
   const { data: teams, isLoading: teamsLoading } = useTeams();
   const { data: workers } = useWorkers();
   const { data: machines } = useMachines();
   const createTeam = useCreateTeam();
   const updateTeam = useUpdateTeam();
   const deleteTeam = useDeleteTeam();
+
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingTeam, setEditingTeam] = useState<Team | null>(null);
@@ -62,7 +67,7 @@ export default function TeamPage() {
   };
 
   const handleDeleteTeam = async (team: Team) => {
-    if (!confirm(`${team.name} жамоасини ўчирмоқчимисиз?`)) return;
+    if (!confirm(tCommon("confirmDelete"))) return;
     try {
       await deleteTeam.mutateAsync(team._id);
     } catch (error) {
@@ -74,7 +79,7 @@ export default function TeamPage() {
     return (
       <div className="custom-container space-y-6">
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-semibold tracking-tight text-gray-900">Жамоалар</h1>
+          <h1 className="text-2xl font-semibold tracking-tight text-gray-900">{t("title")}</h1>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {[1, 2, 3, 4].map(i => <SkeletonCard key={i} />)}
@@ -86,42 +91,42 @@ export default function TeamPage() {
   return (
     <div className="custom-container space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold tracking-tight text-gray-900">Жамоалар</h1>
+        <h1 className="text-2xl font-semibold tracking-tight text-gray-900">{t("title")}</h1>
         <Sheet open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
           <SheetTrigger asChild>
             <button className="flex items-center gap-2 px-3 py-1.5 bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg transition-colors text-sm">
               <Plus className="w-4 h-4" />
-              <span>Jamoa qo'shish</span>
+              <span>{t("addTeam")}</span>
             </button>
           </SheetTrigger>
           <SheetContent>
             <SheetHeader>
-              <SheetTitle>Янги жамоа қўшиш</SheetTitle>
+              <SheetTitle>{t("addTitle")}</SheetTitle>
             </SheetHeader>
             <div className="space-y-4 mt-4">
               <div>
-                <label className="text-sm font-medium text-gray-700 mb-1 block">Жамоа номи</label>
+                <label className="text-sm font-medium text-gray-700 mb-1 block">{t("name")}</label>
                 <Input
                   value={newTeam.name}
                   onChange={(e) => setNewTeam({ ...newTeam, name: e.target.value })}
-                  placeholder="Жамоа номини киритинг"
+                  placeholder={t("placeholderName")}
                 />
               </div>
               <div>
-                <label className="text-sm font-medium text-gray-700 mb-1 block">Машина</label>
+                <label className="text-sm font-medium text-gray-700 mb-1 block">{t("machine")}</label>
                 <select
                   value={newTeam.machine}
                   onChange={(e) => setNewTeam({ ...newTeam, machine: e.target.value })}
                   className="w-full h-8 rounded-lg border border-input bg-transparent px-2.5 py-1 text-sm transition-colors outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
                 >
-                  <option value="">Машинани танланг</option>
+                  <option value="">{t("selectMachine")}</option>
                   {Array.isArray(machines) && machines.map(machine => (
                     <option key={machine._id} value={machine._id}>{machine.number}</option>
                   ))}
                 </select>
               </div>
               <Button onClick={handleAddTeam} className="w-full">
-                Қўшиш
+                {tCommon("add")}
               </Button>
             </div>
           </SheetContent>
@@ -131,32 +136,32 @@ export default function TeamPage() {
         <Sheet open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
           <SheetContent>
             <SheetHeader>
-              <SheetTitle>Жамоани таҳрирлаш</SheetTitle>
+              <SheetTitle>{t("editTitle")}</SheetTitle>
             </SheetHeader>
             <div className="space-y-4 mt-4">
               <div>
-                <label className="text-sm font-medium text-gray-700 mb-1 block">Жамоа номи</label>
+                <label className="text-sm font-medium text-gray-700 mb-1 block">{t("name")}</label>
                 <Input
                   value={newTeam.name}
                   onChange={(e) => setNewTeam({ ...newTeam, name: e.target.value })}
-                  placeholder="Жамоа номини киритинг"
+                  placeholder={t("placeholderName")}
                 />
               </div>
               <div>
-                <label className="text-sm font-medium text-gray-700 mb-1 block">Машина</label>
+                <label className="text-sm font-medium text-gray-700 mb-1 block">{t("machine")}</label>
                 <select
                   value={newTeam.machine}
                   onChange={(e) => setNewTeam({ ...newTeam, machine: e.target.value })}
                   className="w-full h-8 rounded-lg border border-input bg-transparent px-2.5 py-1 text-sm transition-colors outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
                 >
-                  <option value="">Машинани танланг</option>
+                  <option value="">{t("selectMachine")}</option>
                   {Array.isArray(machines) && machines.map(machine => (
                     <option key={machine._id} value={machine._id}>{machine.number}</option>
                   ))}
                 </select>
               </div>
               <Button onClick={handleUpdateTeam} className="w-full">
-                Сақлаш
+                {tCommon("save")}
               </Button>
             </div>
           </SheetContent>
@@ -174,7 +179,9 @@ export default function TeamPage() {
                 <div className="flex items-center justify-between mb-4">
                   <div>
                     <h3 className="font-semibold text-lg text-gray-900">{team.name}</h3>
-                    <p className="text-xs text-gray-500">{team.workersIds.length} ishchi · {team.wells.length} quduq</p>
+                    <p className="text-xs text-gray-500">
+                      {team.workersIds.length} {tWorkers("team").toLowerCase()} · {team.wells.length} quduq
+                    </p>
                   </div>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -183,8 +190,8 @@ export default function TeamPage() {
                       </button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent>
-                      <DropdownMenuItem onClick={() => handleEditTeam(team)}>Таҳрирлаш</DropdownMenuItem>
-                      <DropdownMenuItem className="text-red-600" onClick={() => handleDeleteTeam(team)}>Ўчириш</DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleEditTeam(team)}>{tCommon("edit")}</DropdownMenuItem>
+                      <DropdownMenuItem className="text-red-600" onClick={() => handleDeleteTeam(team)}>{tCommon("delete")}</DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </div>
@@ -205,7 +212,7 @@ export default function TeamPage() {
                       </div>
                       <div>
                         <p className="text-xs font-medium text-gray-900">{worker.name}</p>
-                        <p className="text-xs text-gray-500">{worker.position}</p>
+                        <p className="text-xs text-gray-500">{tWorkers(`positions.${worker.position}`)}</p>
                       </div>
                     </div>
                   ))}
@@ -219,8 +226,8 @@ export default function TeamPage() {
         </div>
       ) : (
         <EmptyState
-          title="Jamoa topilmadi"
-          description="Hozircha hech qanday jamoa qo'shilmagan"
+          title={tCommon("empty")}
+          description=""
         />
       )}
     </div>

@@ -73,13 +73,9 @@ const Navbar = () => {
                   </SheetTitle>
                 </SheetHeader>
                 <div className="flex flex-col gap-6 p-4">
-                  <Accordion
-                    type="single"
-                    collapsible
-                    className="flex w-full flex-col gap-4"
-                  >
+                  <div className="flex w-full flex-col gap-4">
                     {menu.map((item) => RenderMobileMenuItem(item))}
-                  </Accordion>
+                  </div>
                 </div>
               </SheetContent>
             </Sheet>

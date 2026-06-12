@@ -1,30 +1,17 @@
-import {
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from '@/shared/ui/accordion';
 import { MenuItem } from '../lib/model';
-import SubMenuLink from './SubMenuLink';
+import { useTranslations } from 'next-intl';
 
 const RenderMobileMenuItem = (item: MenuItem) => {
-  if (item.items) {
-    return (
-      <AccordionItem key={item.title} value={item.title} className="border-b-0">
-        <AccordionTrigger className="text-md py-0 font-semibold hover:no-underline">
-          {item.title}
-        </AccordionTrigger>
-        <AccordionContent className="mt-2">
-          {item.items.map((subItem) => (
-            <SubMenuLink key={subItem.title} item={subItem} />
-          ))}
-        </AccordionContent>
-      </AccordionItem>
-    );
-  }
+  const t = useTranslations();
 
   return (
-    <a key={item.title} href={item.url} className="text-md font-semibold">
-      {item.title}
+    <a
+      key={item.title}
+      href={item.url}
+      className="text-md font-semibold flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 transition-colors text-gray-700 hover:text-indigo-600"
+    >
+      {item.icon && <item.icon className="w-5 h-5 text-gray-400 group-hover:text-indigo-600" />}
+      <span>{t(item.title)}</span>
     </a>
   );
 };

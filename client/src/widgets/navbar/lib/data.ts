@@ -1,89 +1,26 @@
-import { Users, User, Wrench, Truck, MapPin, Package, ArrowLeftRight, ShoppingCart, LayoutGrid } from 'lucide-react';
+import { Users, User, Truck, MapPin, Package, ArrowLeftRight, ShoppingCart, LayoutGrid } from 'lucide-react';
 import { MenuItem } from './model';
 import { LanguageRoutes } from '@/shared/config/i18n/types';
 
 const menu: MenuItem[] = [
-  { title: 'Ҳаммаси', url: '/dashboard', icon: LayoutGrid },
-  {
-    title: 'Ишчилар',
-    url: '/dashboard/worker',
-    items: [
-      {
-        title: 'Барча ишчилар',
-        description: 'Ҳамма ишчилар рўйхати',
-        icon: Users,
-        url: '/dashboard/worker',
-      },
-      {
-        title: 'Жамоалар',
-        description: 'Ишчилар жамоалари',
-        icon: User,
-        url: '/dashboard/team',
-      },
-    ],
-  },
-  {
-    title: 'Техника',
-    url: '/dashboard/machine',
-    items: [
-      {
-        title: 'Машиналар',
-        description: 'Барча машиналар рўйхати',
-        icon: Truck,
-        url: '/dashboard/machine',
-      },
-      {
-        title: 'Қудуқлар',
-        description: 'Қудуқлар маълумотлари',
-        icon: MapPin,
-        url: '/dashboard/well',
-      },
-    ],
-  },
-  {
-    title: 'Омбор',
-    url: '/dashboard/wareitem',
-    items: [
-      {
-        title: 'Махсулотлар',
-        description: 'Омбордаги махсулотлар',
-        icon: Package,
-        url: '/dashboard/wareitem',
-      },
-    ],
-  },
-  {
-    title: 'Олди Сотди',
-    url: '/dashboard/purchase',
-    items: [
-      {
-        title: 'Харидлар',
-        description: 'Барча харидлар рўйхати',
-        icon: ShoppingCart,
-        url: '/dashboard/purchase',
-      },
-      {
-        title: 'Транзакциялар',
-        description: 'Пул транзакциялари',
-        icon: ArrowLeftRight,
-        url: '/dashboard/transaction',
-      },
-    ],
-  },
+  { title: 'Navbar.dashboard', url: '/dashboard', icon: LayoutGrid },
+  { title: 'Navbar.worker', url: '/dashboard/worker', icon: Users },
+  { title: 'Navbar.team', url: '/dashboard/team', icon: User },
+  { title: 'Navbar.machine', url: '/dashboard/machine', icon: Truck },
+  { title: 'Navbar.well', url: '/dashboard/well', icon: MapPin },
+  { title: 'Navbar.wareitem', url: '/dashboard/wareitem', icon: Package },
+  { title: 'Navbar.purchase', url: '/dashboard/purchase', icon: ShoppingCart },
+  { title: 'Navbar.transaction', url: '/dashboard/transaction', icon: ArrowLeftRight },
 ];
 
 const languages: { name: string; key: LanguageRoutes }[] = [
   {
-    name: "O'zbekcha",
+    name: "Lotin (O'zbek)",
     key: LanguageRoutes.UZ,
   },
   {
-    name: 'Ўзбекча',
+    name: 'Кирилл (Ўзбек)',
     key: LanguageRoutes.KI,
-  },
-  {
-    name: 'Русский',
-    key: LanguageRoutes.RU,
   },
 ];
 

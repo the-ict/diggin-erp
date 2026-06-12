@@ -2,9 +2,193 @@
 // See: https://next-intl.dev/docs/workflows/typescript#messages-arguments
 
 declare const messages: {
-  "HomePage": {
-    "title": "Salom dunyo!",
-    "about": "Go to the about page"
+  "Navbar": {
+    "dashboard": "Bosh sahifa",
+    "worker": "Ishchilar",
+    "team": "Jamoalar",
+    "machine": "Mashinalar",
+    "well": "Quduqlar",
+    "wareitem": "Mahsulotlar",
+    "purchase": "Xaridlar",
+    "transaction": "Tranzaksiyalar"
+  },
+  "Dashboard": {
+    "title": "Bosh sahifa",
+    "monthlyIncome": "Oylik Kirim",
+    "monthlyOutcome": "Oylik Chiqim",
+    "transactions": "{count} ta tranzaksiya",
+    "incomeVsOutcome": "So'nggi 6 oy — Daromad vs Xarajat",
+    "income": "Daromad",
+    "outcome": "Xarajat",
+    "wellStatusDistribution": "Quduqlar holati taqsimoti",
+    "wareitemStockDistribution": "Ombordagi mahsulotlar miqdori",
+    "recentWareTransactions": "Oxirgi Ombor Tranzaksiyalari",
+    "product": "Mahsulot",
+    "quantity": "Miqdor",
+    "type": "Tur",
+    "date": "Sana",
+    "loading": "Yuklanmoqda..."
+  },
+  "Workers": {
+    "title": "Ishchilar",
+    "addWorker": "Ishchi qo'shish",
+    "name": "Ism",
+    "phone": "Telefon",
+    "team": "Jamoa",
+    "position": "Lavozim",
+    "actions": "Amallar",
+    "all": "Hammasi",
+    "addTitle": "Yangi ishchi qo'shish",
+    "editTitle": "Ishchini tahrirlash",
+    "placeholderName": "Ismni kiriting",
+    "placeholderPhone": "+998 90 123 45 67",
+    "selectTeam": "Jamoani tanlang",
+    "selectPosition": "Lavozimni tanlang",
+    "positions": {
+      "DRIVER": "Haydovchi",
+      "OPERATOR": "Operator",
+      "WORKER": "Ishchi",
+      "SUPERVISOR": "Nazoratchi",
+      "MASTER": "Usta"
+    }
+  },
+  "Teams": {
+    "title": "Jamoalar",
+    "addTeam": "Jamoa qo'shish",
+    "name": "Jamoa nomi",
+    "machine": "Mashina",
+    "workersCount": "Ishchilar soni",
+    "actions": "Amallar",
+    "addTitle": "Yangi jamoa qo'shish",
+    "editTitle": "Jamoani tahrirlash",
+    "placeholderName": "Jamoa nomini kiriting",
+    "selectMachine": "Mashinani tanlang"
+  },
+  "Machines": {
+    "title": "Mashinalar",
+    "addMachine": "Mashina qo'shish",
+    "number": "Mashina raqami",
+    "team": "Jamoa",
+    "status": "Holati",
+    "actions": "Amallar",
+    "all": "Hammasi",
+    "addTitle": "Yangi mashina qo'shish",
+    "editTitle": "Mashinani tahrirlash",
+    "placeholderNumber": "Mashina raqamini kiriting",
+    "selectTeam": "Jamoani tanlang",
+    "selectStatus": "Holatni tanlang",
+    "wellsCount": "{count} ta quduq qazilgan",
+    "statuses": {
+      "ACTIVE": "Faol",
+      "REPAIRING": "Ta'mirda"
+    }
+  },
+  "Wells": {
+    "title": "Quduqlar",
+    "addWell": "Quduq qo'shish",
+    "team": "Jamoa",
+    "expectedLength": "Kutilayotgan uzunlik",
+    "length": "Uzunlik",
+    "status": "Holati",
+    "actions": "Amallar",
+    "all": "Hammasi",
+    "addTitle": "Yangi quduq qo'shish",
+    "editTitle": "Quduqni tahrirlash",
+    "placeholderExpectedLength": "Kutilayotgan uzunlikni kiriting (m)",
+    "selectTeam": "Jamoani tanlang",
+    "selectStatus": "Holatni tanlang",
+    "chartProgress": "Kutilayotgan vs Haqiqiy Uzunlik (m)",
+    "chartExpected": "Kutilayotgan",
+    "chartActual": "Haqiqiy",
+    "statuses": {
+      "DUGGING": "Qazilmoqda",
+      "FINISHED": "Tugallangan",
+      "SUCCESSFUL": "Muvaqqiyatli",
+      "FAILED": "Muvaffaqiyatsiz"
+    }
+  },
+  "WareItems": {
+    "title": "Ombor mahsulotlari",
+    "addWareItem": "Mahsulot qo'shish",
+    "addTransaction": "Tranzaksiya qo'shish",
+    "product": "Mahsulot",
+    "quantity": "Miqdor",
+    "actions": "Amallar",
+    "all": "Hammasi",
+    "lowStock": "Kam miqdor",
+    "normalStock": "Normal",
+    "addTitle": "Yangi mahsulot qo'shish",
+    "editTitle": "Mahsulotni tahrirlash",
+    "placeholderName": "Mahsulot nomini kiriting",
+    "placeholderQuantity": "Miqdorni kiriting",
+    "transactionTitle": "Ombor tranzaksiyasi qo'shish",
+    "worker": "Xodim",
+    "selectProduct": "Mahsulotni tanlang",
+    "selectWorker": "Xodimni tanlang",
+    "transactionType": "Tranzaksiya turi",
+    "chartStock": "Ombor zaxiralari miqdori",
+    "types": {
+      "INCOME": "Kirim",
+      "OUTCOME": "Chiqim"
+    }
+  },
+  "Purchases": {
+    "title": "Xaridlar",
+    "addPurchase": "Xarid qo'shish",
+    "name": "Nomi",
+    "quantity": "Soni",
+    "price": "Narxi",
+    "type": "Turi",
+    "note": "Eslatma",
+    "actions": "Amallar",
+    "totalCost": "Jami Xarajatlar",
+    "addTitle": "Yangi xarid qo'shish",
+    "editTitle": "Xaridni tahrirlash",
+    "placeholderName": "Mahsulot nomini kiriting",
+    "placeholderQuantity": "Sonini kiriting",
+    "placeholderPrice": "Narxini kiriting",
+    "placeholderNote": "Eslatma kiriting",
+    "types": {
+      "INCOME": "Sotib olindi",
+      "OUTCOME": "Sotildi"
+    }
+  },
+  "Transactions": {
+    "title": "Tranzaksiyalar",
+    "addTransaction": "Tranzaksiya qo'shish",
+    "amount": "Qiymat",
+    "type": "Turi",
+    "currency": "Pul turi",
+    "note": "Eslatma",
+    "actions": "Amallar",
+    "totalIncome": "Jami Kirim",
+    "totalOutcome": "Jami Chiqim",
+    "addTitle": "Yangi tranzaksiya qo'shish",
+    "editTitle": "Tranzaksiyani tahrirlash",
+    "placeholderAmount": "Qiymatni kiriting",
+    "placeholderNote": "Eslatma kiriting",
+    "selectType": "Turini tanlang",
+    "selectCurrency": "Valyutani tanlang",
+    "chartFlow": "Tranzaksiyalar harakati",
+    "types": {
+      "INCOME": "Kirim",
+      "OUTCOME": "Chiqim"
+    },
+    "currencies": {
+      "USD": "Dollar",
+      "UZS": "O'zbek so'mi"
+    }
+  },
+  "Common": {
+    "add": "Qo'shish",
+    "save": "Saqlash",
+    "edit": "Tahrirlash",
+    "delete": "O'chirish",
+    "cancel": "Bekor qilish",
+    "empty": "Hozircha hech qanday ma'lumot qo'shilmagan",
+    "confirmDelete": "O'chirishni tasdiqlaysizmi?",
+    "success": "Muvaffaqiyatli",
+    "error": "Xatolik yuz berdi"
   }
 };
 export default messages;
