@@ -3,7 +3,7 @@ import Joi from "joi";
 const createWorkerValidator = Joi.object({
     name: Joi.string().required(),
     phone: Joi.string().required(),
-    teamId: Joi.string().required(),
+    teamId: Joi.string().optional(),
     position: Joi.string().valid("DRIVER", "OPERATOR", "WORKER", "SUPERVISOR","MASTER").required(),
 });
 
@@ -17,4 +17,4 @@ const updateWorkerValidator = Joi.object({
 export {
     createWorkerValidator,
     updateWorkerValidator
-}
+};

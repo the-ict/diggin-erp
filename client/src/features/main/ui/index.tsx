@@ -16,32 +16,32 @@ export default function MainPage() {
   const currentMonth = new Date().getMonth();
   const currentYear = new Date().getFullYear();
 
-  const monthlyIncome = transactions?.filter((t: Transaction) => {
+  const monthlyIncome = Array.isArray(transactions) ? transactions.filter((t: Transaction) => {
     const d = new Date(t.createdAt);
-    return t.type === "INCOME" && 
-           d.getMonth() === currentMonth && 
+    return t.type === "INCOME" &&
+           d.getMonth() === currentMonth &&
            d.getFullYear() === currentYear;
-  }).reduce((sum: number, t: Transaction) => sum + t.amount, 0) || 0;
+  }).reduce((sum: number, t: Transaction) => sum + t.amount, 0) : 0;
 
-  const monthlyOutcome = transactions?.filter((t: Transaction) => {
+  const monthlyOutcome = Array.isArray(transactions) ? transactions.filter((t: Transaction) => {
     const d = new Date(t.createdAt);
-    return t.type === "OUTCOME" && 
-           d.getMonth() === currentMonth && 
+    return t.type === "OUTCOME" &&
+           d.getMonth() === currentMonth &&
            d.getFullYear() === currentYear;
-  }).reduce((sum: number, t: Transaction) => sum + t.amount, 0) || 0;
+  }).reduce((sum: number, t: Transaction) => sum + t.amount, 0) : 0;
 
-  const incomeCount = transactions?.filter((t: Transaction) => {
+  const incomeCount = Array.isArray(transactions) ? transactions.filter((t: Transaction) => {
     const d = new Date(t.createdAt);
-    return t.type === "INCOME" && 
+    return t.type === "INCOME" &&
            d.getMonth() === currentMonth &&           d.getFullYear() === currentYear;
-  }).length || 0;
+  }).length : 0;
 
-  const outcomeCount = transactions?.filter((t: Transaction) => {
+  const outcomeCount = Array.isArray(transactions) ? transactions.filter((t: Transaction) => {
     const d = new Date(t.createdAt);
-    return t.type === "OUTCOME" && 
-           d.getMonth() === currentMonth && 
+    return t.type === "OUTCOME" &&
+           d.getMonth() === currentMonth &&
            d.getFullYear() === currentYear;
-  }).length || 0;
+  }).length : 0;
 
   // Calculate last 6 months data
   const last6Months = Array.from({ length: 6 }, (_, i) => {
@@ -54,7 +54,7 @@ export default function MainPage() {
     };
   });
 
-  transactions?.forEach((t: Transaction) => {
+  Array.isArray(transactions) && transactions.forEach((t: Transaction) => {
     const d = new Date(t.createdAt);
     const monthData = last6Months.find(m => {
       const md = new Date();
@@ -139,7 +139,7 @@ export default function MainPage() {
               </tr>
             </thead>
             <tbody>
-              {wareTransactions?.slice(0, 5).map((transaction: WareTransaction) => (
+              {Array.isArray(wareTransactions) && wareTransactions.slice(0, 5).map((transaction: WareTransaction) => (
                 <tr key={transaction._id} className="border-b border-gray-100 hover:bg-gray-50">
                   <td className="py-3.5 text-sm text-gray-900">{transaction.wareItemId}</td>
                   <td className="py-3.5 font-mono text-sm text-gray-900">{transaction.quantity}</td>
