@@ -120,15 +120,9 @@ export default function PurchasePage() {
         </Sheet>
 
         <Sheet open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
-          <SheetTrigger asChild>
-            <button className="flex items-center gap-2 px-3 py-1.5 bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg transition-colors text-sm">
-              <Plus className="w-4 h-4" />
-              <span>Qo'shish</span>
-            </button>
-          </SheetTrigger>
           <SheetContent>
             <SheetHeader>
-              <SheetTitle>Xarid o'zgartirish</SheetTitle>
+              <SheetTitle>Xaridni tahrirlash</SheetTitle>
             </SheetHeader>
             <div className="space-y-4 mt-4 text-[16px]">
               <label>Maxsulot nomi</label>
@@ -193,7 +187,7 @@ export default function PurchasePage() {
                   </td>
                   <td className="py-3.5 text-right px-6">
                     <DropdownMenu>
-                      <DropdownMenuTrigger>
+                      <DropdownMenuTrigger asChild>
                         <button className="text-gray-400 hover:text-gray-600 transition-colors">
                           <MoreVertical className="w-5 h-5" />
                         </button>
