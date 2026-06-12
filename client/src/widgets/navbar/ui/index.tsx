@@ -1,12 +1,6 @@
 "use client"
 
-import { Accordion } from '@/shared/ui/accordion';
 import { Button } from '@/shared/ui/button';
-import {
-  NavigationMenu,
-  NavigationMenuList,
-} from '@/shared/ui/navigation-menu';
-import RenderMobileMenuItem from './RenderMobileMenuItem';
 import {
   Sheet,
   SheetContent,
@@ -14,11 +8,15 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/shared/ui/sheet';
-import { Menu } from 'lucide-react';
-import { PRODUCT_INFO } from '@/shared/constants/data';
-import { menu } from '../lib/data';
+import RenderMobileMenuItem from './RenderMobileMenuItem';
 import RenderMenuItem from './RenderItem';
 import { ChangeLang } from './ChangeLang';
+import { Menu } from 'lucide-react';
+import { menu } from '../lib/data';
+import {
+  NavigationMenu,
+  NavigationMenuList,
+} from '@/shared/ui/navigation-menu';
 import Link from 'next/link';
 
 const Navbar = () => {
@@ -27,16 +25,6 @@ const Navbar = () => {
       <div className="custom-container">
         <nav className="hidden justify-between lg:flex">
           <div className="flex items-center gap-6">
-            <Link href={'/'} className="flex items-center gap-2">
-              <img
-                src={PRODUCT_INFO.logo}
-                className="max-h-8"
-                alt={PRODUCT_INFO.name}
-              />
-              <span className="text-lg font-semibold tracking-tight text-gray-900">
-                {PRODUCT_INFO.name}
-              </span>
-            </Link>
             <div className="flex items-center">
               <NavigationMenu>
                 <NavigationMenuList>

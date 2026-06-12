@@ -181,6 +181,7 @@ declare const messages: {
   },
   "Common": {
     "add": "Qo'shish",
+    "all":"Hammasi",
     "save": "Saqlash",
     "edit": "Tahrirlash",
     "delete": "O'chirish",
