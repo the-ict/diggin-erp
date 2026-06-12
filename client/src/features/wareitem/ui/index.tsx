@@ -27,12 +27,12 @@ export default function WareItemPage() {
     "NORMAL": "Нормал"
   };
 
-  const filteredItems = wareItems?.filter(item => {
+  const filteredItems = Array.isArray(wareItems) ? wareItems.filter(item => {
     if (filterStock === "ALL") return true;
     if (filterStock === "LOW") return item.quantity <= MINIMUM_QUANTITY;
     if (filterStock === "NORMAL") return item.quantity > MINIMUM_QUANTITY;
     return true;
-  });
+  }) : [];
 
   const handleAddWareItem = async () => {
     try {

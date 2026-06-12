@@ -20,9 +20,9 @@ export default function WellPage() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [newWell, setNewWell] = useState({ team: "", length: 0, except_length: 0, status: "DUGGING" as WellStatus });
 
-  const filteredWells = wells?.filter(well => 
+  const filteredWells = Array.isArray(wells) ? wells.filter(well => 
     filterStatus === "ALL" || well.status === filterStatus
-  );
+  ) : [];
 
   const statuses: (WellStatus | "ALL")[] = ["ALL", "DUGGING", "FINISHED", "SUCCESSFUL", "FAILED"];
 
@@ -81,7 +81,7 @@ export default function WellPage() {
                   className="w-full h-8 rounded-lg border border-input bg-transparent px-2.5 py-1 text-sm transition-colors outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
                 >
                   <option value="">Жамоани танланг</option>
-                  {teams?.map(team => (
+                  {Array.isArray(teams) && teams.map(team => (
                     <option key={team._id} value={team._id}>{team.name}</option>
                   ))}
                 </select>
@@ -157,7 +157,7 @@ export default function WellPage() {
             </thead>
             <tbody>
               {filteredWells.map((well: Well) => {
-                const team = teams?.find(t => t._id === well.team);
+                const team = Array.isArray(teams) ? teams.find(t => t._id === well.team) : undefined;
                 return (
                   <tr key={well._id} className="border-b border-gray-100 hover:bg-gray-50">
                     <td className="py-3.5 text-sm text-gray-900 px-6">{team?.name ?? well.team}</td>

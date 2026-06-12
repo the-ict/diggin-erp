@@ -20,9 +20,9 @@ export default function MachinePage() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [newMachine, setNewMachine] = useState({ number: "", status: "ACTIVE" as MachineStatus, teamId: "", wells: [] as string[] });
 
-  const filteredMachines = machines?.filter(machine => 
+  const filteredMachines = Array.isArray(machines) ? machines.filter(machine => 
     filterStatus === "ALL" || machine.status === filterStatus
-  );
+  ) : [];
 
   const statuses: (MachineStatus | "ALL")[] = ["ALL", "ACTIVE", "REPAIRING"];
 
@@ -87,7 +87,7 @@ export default function MachinePage() {
                   className="w-full h-8 rounded-lg border border-input bg-transparent px-2.5 py-1 text-sm transition-colors outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
                 >
                   <option value="">Жамоани танланг</option>
-                  {teams?.map(team => (
+                  {Array.isArray(teams) && teams.map(team => (
                     <option key={team._id} value={team._id}>{team.name}</option>
                   ))}
                 </select>
@@ -132,7 +132,7 @@ export default function MachinePage() {
       {filteredMachines && filteredMachines.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredMachines.map((machine: Machine) => {
-            const team = teams?.find(t => t._id === machine.teamId);
+            const team = Array.isArray(teams) ? teams.find(t => t._id === machine.teamId) : undefined;
             return (
               <div key={machine._id} className="bg-white border border-gray-200 rounded-xl p-5 hover:border-indigo-300 transition-colors shadow-sm">
                 <div className="flex items-start justify-between mb-3">

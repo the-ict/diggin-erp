@@ -1,10 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { Phone, Users, MoreVertical, Plus, X } from "lucide-react";
+import { Phone, MoreVertical, Plus, X } from "lucide-react";
 import { useWorkers, useCreateWorker } from "@/shared/lib/hooks/use-workers";
 import { useTeams } from "@/shared/lib/hooks/use-teams";
-import { StatusBadge } from "@/shared/ui/StatusBadge";
 import { SkeletonCard } from "@/shared/ui/SkeletonCard";
 import { EmptyState } from "@/shared/ui/EmptyState";
 import { Worker, WorkerPosition } from "@/shared/config/api/worker.model";
@@ -20,9 +19,9 @@ export default function WorkerPage() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [newWorker, setNewWorker] = useState({ name: "", phone: "", position: "WORKER" as WorkerPosition, teamId: "" });
 
-  const filteredWorkers = workers?.filter(worker => 
+  const filteredWorkers = Array.isArray(workers) ? workers.filter(worker => 
     filterPosition === "ALL" || worker.position === filterPosition
-  );
+  ) : [];
 
   const positions: (WorkerPosition | "ALL")[] = ["ALL", "DRIVER", "OPERATOR", "WORKER", "SUPERVISOR", "MASTER"];
 
@@ -98,7 +97,7 @@ export default function WorkerPage() {
                   className="w-full h-8 rounded-lg border border-input bg-transparent px-2.5 py-1 text-sm transition-colors outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
                 >
                   <option value="">Жамоани танланг</option>
-                  {teams?.map(team => (
+                  {Array.isArray(teams) && teams.map(team => (
                     <option key={team._id} value={team._id}>{team.name}</option>
                   ))}
                 </select>

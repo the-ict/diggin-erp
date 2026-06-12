@@ -78,7 +78,7 @@ export default function TeamPage() {
                   className="w-full h-8 rounded-lg border border-input bg-transparent px-2.5 py-1 text-sm transition-colors outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
                 >
                   <option value="">Машинани танланг</option>
-                  {machines?.map(machine => (
+                  {Array.isArray(machines) && machines.map(machine => (
                     <option key={machine._id} value={machine._id}>{machine.number}</option>
                   ))}
                 </select>
@@ -91,11 +91,11 @@ export default function TeamPage() {
         </Sheet>
       </div>
 
-      {teams && teams.length > 0 ? (
+      {Array.isArray(teams) && teams.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {teams.map((team: Team) => {
-            const teamWorkers = workers?.filter(w => team.workersIds.includes(w._id)) || [];
-            const teamMachine = machines?.find(m => m._id === team.machine);
+            const teamWorkers = Array.isArray(workers) ? workers.filter(w => team.workersIds.includes(w._id)) : [];
+            const teamMachine = Array.isArray(machines) ? machines.find(m => m._id === team.machine) : undefined;
 
             return (
               <div key={team._id} className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
