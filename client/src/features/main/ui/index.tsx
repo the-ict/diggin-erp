@@ -1,16 +1,20 @@
 "use client";
 
-import { useTransactions } from "@/shared/lib/hooks/use-transactions";
-import { useWareTransactions } from "@/shared/lib/hooks/use-ware-transactions";
-import { useWells } from "@/shared/lib/hooks/use-wells";
-import { useWareItems } from "@/shared/lib/hooks/use-ware-items";
-import { TrendingUp, TrendingDown, Layers, MapPin, Package } from "lucide-react";
-import { StatusBadge } from "@/shared/ui/StatusBadge";
-import { SkeletonCard } from "@/shared/ui/SkeletonCard";
-import { Transaction } from "@/shared/config/api/transaction.model";
+import { TrendingUp, TrendingDown, Layers, MapPin, Package, Drill } from "lucide-react";
 import { WareTransaction } from "@/shared/config/api/wareTransaction.model";
+import { useWareTransactions } from "@/shared/lib/hooks/use-ware-transactions";
+import { useTransactions } from "@/shared/lib/hooks/use-transactions";
+import { Transaction } from "@/shared/config/api/transaction.model";
+import { useWareItems } from "@/shared/lib/hooks/use-ware-items";
+import { useWells } from "@/shared/lib/hooks/use-wells";
+import { SkeletonCard } from "@/shared/ui/SkeletonCard";
+import { StatusBadge } from "@/shared/ui/StatusBadge";
 import { useTranslations } from "next-intl";
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/shared/ui/chart";
+import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent
+} from "@/shared/ui/chart";
 import {
   BarChart,
   Bar,
@@ -20,7 +24,6 @@ import {
   Cell,
   PieChart,
   Pie,
-  Tooltip,
   Legend,
 } from "recharts";
 
@@ -34,59 +37,29 @@ export default function MainPage() {
   const { data: wells, isLoading: wellsLoading } = useWells();
   const { data: wareItems, isLoading: wareItemsLoading } = useWareItems();
 
-  // Calculate current month income/outcome
   const currentMonth = new Date().getMonth();
   const currentYear = new Date().getFullYear();
 
   const monthlyIncome = Array.isArray(transactions)
     ? transactions
-        .filter((t: Transaction) => {
-          const d = new Date(t.createdAt);
-          return (
-            t.type === "INCOME" &&
-            d.getMonth() === currentMonth &&
-            d.getFullYear() === currentYear
-          );
-        })
-        .reduce((sum: number, t: Transaction) => sum + t.amount, 0)
+      .filter((t: Transaction) => t.type === "INCOME")
+      .reduce((sum: number, t: Transaction) => sum + t.amount, 0)
     : 0;
 
   const monthlyOutcome = Array.isArray(transactions)
     ? transactions
-        .filter((t: Transaction) => {
-          const d = new Date(t.createdAt);
-          return (
-            t.type === "OUTCOME" &&
-            d.getMonth() === currentMonth &&
-            d.getFullYear() === currentYear
-          );
-        })
-        .reduce((sum: number, t: Transaction) => sum + t.amount, 0)
+      .filter((t: Transaction) => t.type === "OUTCOME")
+      .reduce((sum: number, t: Transaction) => sum + t.amount, 0)
     : 0;
 
   const incomeCount = Array.isArray(transactions)
-    ? transactions.filter((t: Transaction) => {
-        const d = new Date(t.createdAt);
-        return (
-          t.type === "INCOME" &&
-          d.getMonth() === currentMonth &&
-          d.getFullYear() === currentYear
-        );
-      }).length
+    ? transactions.filter((t: Transaction) => t.type === "INCOME").length
     : 0;
 
   const outcomeCount = Array.isArray(transactions)
-    ? transactions.filter((t: Transaction) => {
-        const d = new Date(t.createdAt);
-        return (
-          t.type === "OUTCOME" &&
-          d.getMonth() === currentMonth &&
-          d.getFullYear() === currentYear
-        );
-      }).length
+    ? transactions.filter((t: Transaction) => t.type === "OUTCOME").length
     : 0;
 
-  // Calculate last 6 months data
   const last6Months = Array.from({ length: 6 }, (_, i) => {
     const d = new Date();
     d.setMonth(d.getMonth() - (5 - i));
@@ -97,29 +70,21 @@ export default function MainPage() {
     };
   });
 
+  // Add all transactions to current month (last in array) regardless of date
   Array.isArray(transactions) &&
     transactions.forEach((t: Transaction) => {
-      const d = new Date(t.createdAt);
-      const monthData = last6Months.find((m) => {
-        const md = new Date();
-        md.setMonth(md.getMonth() - (5 - last6Months.indexOf(m)));
-        return d.getMonth() === md.getMonth() && d.getFullYear() === md.getFullYear();
-      });
-      if (monthData) {
-        if (t.type === "INCOME") {
-          monthData.income += t.amount;
-        } else {
-          monthData.outcome += t.amount;
-        }
+      if (t.type === "INCOME") {
+        last6Months[5].income += t.amount;
+      } else {
+        last6Months[5].outcome += t.amount;
       }
     });
 
-  // Calculate well status data
   const wellStatusCounts = Array.isArray(wells)
     ? wells.reduce((acc: Record<string, number>, w) => {
-        acc[w.status] = (acc[w.status] || 0) + 1;
-        return acc;
-      }, {})
+      acc[w.status] = (acc[w.status] || 0) + 1;
+      return acc;
+    }, {})
     : {};
 
   const wellStatusData = Object.entries(wellStatusCounts).map(([status, count]) => ({
@@ -129,18 +94,17 @@ export default function MainPage() {
   }));
 
   const wellColors: Record<string, string> = {
-    DUGGING: "#f59e0b", // amber-500
-    FINISHED: "#3b82f6", // blue-500
-    SUCCESSFUL: "#10b981", // emerald-500
-    FAILED: "#ef4444", // red-500
+    DUGGING: "#f59e0b",
+    FINISHED: "#3b82f6",
+    SUCCESSFUL: "#10b981",
+    FAILED: "#ef4444",
   };
 
-  // Calculate top warehouse items
   const stockData = Array.isArray(wareItems)
     ? wareItems.slice(0, 6).map((item) => ({
-        name: item.name,
-        quantity: item.quantity,
-      }))
+      name: item.name,
+      quantity: item.quantity,
+    }))
     : [];
 
   const formatCurrency = (amount: number) => {
@@ -192,7 +156,6 @@ export default function MainPage() {
     <div className="custom-container space-y-6">
       <h1 className="text-2xl font-semibold tracking-tight text-gray-900">{t("title")}</h1>
 
-      {/* Income/Outcome Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="bg-white border border-gray-200 rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow">
           <div className="flex items-center gap-2 mb-3">
@@ -221,7 +184,6 @@ export default function MainPage() {
         </div>
       </div>
 
-      {/* Monthly Finance Chart */}
       <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
         <h2 className="text-lg font-semibold text-gray-900 mb-4">{t("incomeVsOutcome")}</h2>
         <div className="h-80">
@@ -251,9 +213,7 @@ export default function MainPage() {
         </div>
       </div>
 
-      {/* Grid for Well Status and Stock charts */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Donut Chart for Well Status */}
         <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
           <div className="flex items-center gap-2 mb-4">
             <MapPin className="w-5 h-5 text-indigo-500" />
@@ -289,7 +249,6 @@ export default function MainPage() {
           </div>
         </div>
 
-        {/* Bar Chart for Warehouse Stock */}
         <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
           <div className="flex items-center gap-2 mb-4">
             <Package className="w-5 h-5 text-indigo-500" />
@@ -326,7 +285,47 @@ export default function MainPage() {
         </div>
       </div>
 
-      {/* Recent Ware Transactions */}
+      <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+        <div className="flex items-center gap-2 mb-4">
+          <Drill className="w-5 h-5 text-indigo-500" />
+          <h2 className="text-lg font-semibold text-gray-900">{tWells("title")}</h2>
+        </div>
+        <div className="space-y-4">
+          {Array.isArray(wells) && wells.length > 0 ? (
+            wells
+              .slice(0, 2)
+              .map((well) => {
+                const progress = well.except_length > 0 ? (well.length / well.except_length) * 100 : 0;
+                const progressClamped = Math.min(Math.max(progress, 0), 100);
+                return (
+                  <div key={well._id} className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-medium text-gray-900">
+                        {tWells("title")} #{well._id.slice(-6)}
+                      </span>
+                      <span className="text-sm text-gray-500">
+                        {well.length}m / {well.except_length}m
+                      </span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2.5">
+                      <div
+                        className="bg-indigo-500 h-2.5 rounded-full transition-all duration-300"
+                        style={{ width: `${progressClamped}%` }}
+                      />
+                    </div>
+                    <div className="flex items-center justify-between text-xs mt-3">
+                      <StatusBadge status={well.status} />
+                      <span className="text-gray-500">{progressClamped.toFixed(1)}%</span>
+                    </div>
+                  </div>
+                );
+              })
+          ) : (
+            <p className="text-sm text-gray-500">{tCommon("empty")}</p>
+          )}
+        </div>
+      </div>
+
       <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
         <h2 className="text-lg font-semibold text-gray-900 mb-4">{t("recentWareTransactions")}</h2>
         <div className="overflow-x-auto">

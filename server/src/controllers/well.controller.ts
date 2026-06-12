@@ -1,6 +1,7 @@
 import { Well } from "../models/well.model.js";
 import { TeamModel } from "../models/team.model.js";
 import type { Request, Response, NextFunction } from "express";
+import { MachineModel } from "../models/machine.model.js";
 
 export const createWell = async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -9,7 +10,13 @@ export const createWell = async (req: Request, res: Response, next: NextFunction
             await TeamModel.findByIdAndUpdate(well.team, {
                 $addToSet: { wells: well._id }
             });
-        }
+
+            await MachineModel.findOneAndUpdate({
+                teamId: well.team,
+            }, {
+                $addToSet: { wells: well._id }
+            });
+        };
         res.status(201).json({ success: true, data: well });
     } catch (error) {
         next(error);
@@ -52,7 +59,7 @@ export const updateWell = async (req: Request, res: Response, next: NextFunction
             return res.status(404).json({ success: false, error: "Well not found" });
         }
         const well = await Well.findByIdAndUpdate(id, req.body, { new: true });
-        
+
         if (req.body.team && req.body.team !== oldWell.team) {
             if (oldWell.team) {
                 await TeamModel.findByIdAndUpdate(oldWell.team, {
@@ -63,7 +70,7 @@ export const updateWell = async (req: Request, res: Response, next: NextFunction
                 $addToSet: { wells: id }
             });
         }
-        
+
         res.json({ success: true, data: well });
     } catch (error) {
         next(error);

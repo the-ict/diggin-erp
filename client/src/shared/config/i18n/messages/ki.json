@@ -106,6 +106,7 @@
   },
   "WareItems": {
     "title": "Омбор маҳсулотлари",
+    "type": "Тури",
     "addWareItem": "Маҳсулот қўшиш",
     "addTransaction": "Транзакция қўшиш",
     "product": "Маҳсулот",
@@ -152,6 +153,7 @@
   },
   "Transactions": {
     "title": "Транзакциялар",
+    "date": "Сана",
     "addTransaction": "Транзакция қўшиш",
     "amount": "Қиймат",
     "type": "Тури",

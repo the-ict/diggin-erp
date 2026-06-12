@@ -105,3 +105,6 @@
     @apply container px-4 mx-auto;
   }
 }
+::-webkit-scrollbar {
+    display: none;
+}

@@ -109,6 +109,7 @@ declare const messages: {
   },
   "WareItems": {
     "title": "Ombor mahsulotlari",
+    "type": "Turi",
     "addWareItem": "Mahsulot qo'shish",
     "addTransaction": "Tranzaksiya qo'shish",
     "product": "Mahsulot",
@@ -127,6 +128,7 @@ declare const messages: {
     "selectWorker": "Xodimni tanlang",
     "transactionType": "Tranzaksiya turi",
     "chartStock": "Ombor zaxiralari miqdori",
+    "recentWareTransactions": "Oxirgi Ombor Tranzaksiyalari",
     "types": {
       "INCOME": "Kirim",
       "OUTCOME": "Chiqim"
@@ -155,6 +157,7 @@ declare const messages: {
   },
   "Transactions": {
     "title": "Tranzaksiyalar",
+    "date":"Sana",
     "addTransaction": "Tranzaksiya qo'shish",
     "amount": "Qiymat",
     "type": "Turi",
