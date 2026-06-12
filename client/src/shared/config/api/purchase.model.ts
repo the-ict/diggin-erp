@@ -3,6 +3,7 @@ export interface Purchase {
   name: string;
   quantity: number;
   price: number;
+  type: "INCOME" | "OUTCOME";
   note?: string;
   createdAt: string;
 }

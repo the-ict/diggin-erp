@@ -12,6 +12,7 @@ const updatePurchaseValidator = Joi.object({
     name: Joi.string().optional(),
     quantity: Joi.number().optional().min(0),
     price: Joi.number().optional().min(0),
+    type: Joi.string().valid("INCOME", "OUTCOME").allow(""),
     note: Joi.string().optional(),
 }).min(1);
 

@@ -28,7 +28,9 @@ export function useUpdatePurchase() {
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: UpdatePurchaseDto }) =>
       purchaseRequests.update(id, data),
-    onSuccess: () => qc.invalidateQueries({ queryKey: PURCHASE_KEYS.all }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: PURCHASE_KEYS.all })
+    },
   });
 }
 
