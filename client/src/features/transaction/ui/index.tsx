@@ -249,7 +249,7 @@ export default function TransactionPage() {
 
       {/* Transactions Table */}
       {filteredTransactions && filteredTransactions.length > 0 ? (
-        <div className="bg-white border border-gray-200 rounded-xl overflow-x-auto shadow-sm">
+        <div className="bg-white border border-gray-200 rounded-lg py-5 overflow-x-auto shadow-sm">
           <table className="w-full">
             <thead>
               <tr className="border-b border-gray-200 text-xs text-gray-500 uppercase tracking-wider">

@@ -12,6 +12,8 @@ export default function MainPage() {
   const { data: transactions, isLoading: transactionsLoading } = useTransactions();
   const { data: wareTransactions, isLoading: wareTransactionsLoading } = useWareTransactions();
 
+  console.log(transactions, "transactions");
+
   // Calculate current month income/outcome
   const currentMonth = new Date().getMonth();
   const currentYear = new Date().getFullYear();
@@ -97,7 +99,7 @@ export default function MainPage() {
         <div className="bg-white border border-gray-200 rounded-xl p-5 shadow-sm">
           <div className="flex items-center gap-2 mb-3">
             <TrendingUp className="w-4 h-4 text-green-600" />
-            <span className="text-sm text-gray-600">Oylik Daromad</span>
+            <span className="text-sm text-gray-600">Oylik Kirim</span>
           </div>
           <p className="text-2xl font-mono font-semibold text-green-600">
             {formatCurrency(monthlyIncome)} UZS
@@ -108,7 +110,7 @@ export default function MainPage() {
         <div className="bg-white border border-gray-200 rounded-xl p-5 shadow-sm">
           <div className="flex items-center gap-2 mb-3">
             <TrendingDown className="w-4 h-4 text-red-600" />
-            <span className="text-sm text-gray-600">Oylik Xarajat</span>
+            <span className="text-sm text-gray-600">Oylik Chiqim</span>
           </div>
           <p className="text-2xl font-mono font-semibold text-red-600">
             {formatCurrency(monthlyOutcome)} UZS
@@ -126,7 +128,7 @@ export default function MainPage() {
       </div>
 
       {/* Recent Ware Transactions */}
-      <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+      <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
         <h2 className="text-lg font-semibold text-gray-900 mb-4">Oxirgi Ombor Tranzaksiyalari</h2>
         <div className="overflow-x-auto">
           <table className="w-full">

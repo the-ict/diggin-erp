@@ -221,8 +221,8 @@ export default function WellPage() {
 
       {/* Wells Table */}
       {filteredWells && filteredWells.length > 0 ? (
-        <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
-          <table className="overflow-x-auto">
+        <div className="border py-5 border-gray-200 bg-gray-50 rounded-xl overflow-x-auto shadow-sm">
+          <table className="overflow-x-auto w-full">
             <thead>
               <tr className="border-b border-gray-200 bg-gray-50 text-xs text-gray-500 uppercase tracking-wider">
                 <th className="pb-3 text-left px-6">Jamoa</th>
@@ -235,7 +235,7 @@ export default function WellPage() {
               {filteredWells.map((well: Well) => {
                 const team = Array.isArray(teams) ? teams.find(t => t._id === well.team) : undefined;
                 return (
-                  <tr key={well._id} className="border-b border-gray-100 hover:bg-gray-50">
+                  <tr key={well._id} className="border-b border-gray-100 hover:bg-gray-100">
                     <td className="py-3.5 text-sm text-gray-900 px-6">{team?.name ?? well.team}</td>
                     <td className="py-3.5 font-mono text-sm text-gray-900 px-6">{well.except_length}m</td>
                     <td className="py-3.5 px-6"><StatusBadge status={well.status} /></td>

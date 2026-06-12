@@ -161,7 +161,7 @@ export default function PurchasePage() {
 
       {/* Purchases Table */}
       {purchases?.data && purchases.data.length > 0 ? (
-        <div className="bg-white border border-gray-200 rounded-xl overflow-x-auto shadow-sm">
+        <div className="bg-white border border-gray-200 py-5 rounded-xl overflow-x-auto shadow-sm">
           <table className="w-full">
             <thead>
               <tr className="border-b border-gray-200 text-xs text-gray-500 uppercase tracking-wider">
