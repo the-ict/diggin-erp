@@ -7,6 +7,8 @@ const transactionSchema = new mongoose.Schema<ITransaction>({
     type: { type: String, required: true },
     note: { type: String, required: false },
     transferredX: { type: String, required: true },
+},{
+    timestamps: true,
 });
 
 export const Transaction = mongoose.model<ITransaction>("Transaction", transactionSchema);

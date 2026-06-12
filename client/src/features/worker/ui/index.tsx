@@ -2,10 +2,16 @@
 
 import { useState } from "react";
 import { Phone, MoreVertical, Plus, X } from "lucide-react";
-import { useWorkers, useCreateWorker } from "@/shared/lib/hooks/use-workers";
+import { useWorkers, useCreateWorker, useUpdateWorker, useDeleteWorker } from "@/shared/lib/hooks/use-workers";
 import { useTeams } from "@/shared/lib/hooks/use-teams";
 import { SkeletonCard } from "@/shared/ui/SkeletonCard";
 import { EmptyState } from "@/shared/ui/EmptyState";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/shared/ui/dropdown-menu";
 import { Worker, WorkerPosition } from "@/shared/config/api/worker.model";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/shared/ui/sheet";
 import { Button } from "@/shared/ui/button";
@@ -15,8 +21,12 @@ export default function WorkerPage() {
   const { data: workers, isLoading } = useWorkers();
   const { data: teams } = useTeams();
   const createWorker = useCreateWorker();
+  const updateWorker = useUpdateWorker();
+  const deleteWorker = useDeleteWorker();
   const [filterPosition, setFilterPosition] = useState<string>("ALL");
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editingWorker, setEditingWorker] = useState<Worker | null>(null);
   const [newWorker, setNewWorker] = useState({ name: "", phone: "", position: "WORKER" as WorkerPosition, teamId: "" });
 
   const filteredWorkers = Array.isArray(workers) ? workers.filter(worker => 
@@ -41,6 +51,33 @@ export default function WorkerPage() {
       setNewWorker({ name: "", phone: "", position: "WORKER", teamId: "" });
     } catch (error) {
       console.error("Failed to add worker:", error);
+    }
+  };
+
+  const handleEditWorker = (worker: Worker) => {
+    setEditingWorker(worker);
+    setNewWorker({ name: worker.name, phone: worker.phone, position: worker.position, teamId: worker.teamId });
+    setIsEditModalOpen(true);
+  };
+
+  const handleUpdateWorker = async () => {
+    if (!editingWorker) return;
+    try {
+      await updateWorker.mutateAsync({ id: editingWorker._id, data: newWorker });
+      setIsEditModalOpen(false);
+      setEditingWorker(null);
+      setNewWorker({ name: "", phone: "", position: "WORKER", teamId: "" });
+    } catch (error) {
+      console.error("Failed to update worker:", error);
+    }
+  };
+
+  const handleDeleteWorker = async (worker: Worker) => {
+    if (!confirm(`${worker.name} ишчисини ўчирмоқчимисиз?`)) return;
+    try {
+      await deleteWorker.mutateAsync(worker._id);
+    } catch (error) {
+      console.error("Failed to delete worker:", error);
     }
   };
 
@@ -122,6 +159,63 @@ export default function WorkerPage() {
             </div>
           </SheetContent>
         </Sheet>
+
+        {/* Edit Worker Modal */}
+        <Sheet open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
+          <SheetContent>
+            <SheetHeader>
+              <SheetTitle>Ишчини таҳрирлаш</SheetTitle>
+            </SheetHeader>
+            <div className="space-y-4 mt-4">
+              <div>
+                <label className="text-sm font-medium text-gray-700 mb-1 block">Исм</label>
+                <Input
+                  value={newWorker.name}
+                  onChange={(e) => setNewWorker({ ...newWorker, name: e.target.value })}
+                  placeholder="Исмни киритинг"
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-700 mb-1 block">Телефон</label>
+                <Input
+                  value={newWorker.phone}
+                  onChange={(e) => setNewWorker({ ...newWorker, phone: e.target.value })}
+                  placeholder="+998 90 123 45 67"
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-700 mb-1 block">Жамоа</label>
+                <select
+                  value={newWorker.teamId}
+                  onChange={(e) => setNewWorker({ ...newWorker, teamId: e.target.value })}
+                  className="w-full h-8 rounded-lg border border-input bg-transparent px-2.5 py-1 text-sm transition-colors outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+                >
+                  <option value="">Жамоани танланг</option>
+                  {Array.isArray(teams) && teams.map(team => (
+                    <option key={team._id} value={team._id}>{team.name}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-700 mb-1 block">Лавозим</label>
+                <select
+                  value={newWorker.position}
+                  onChange={(e) => setNewWorker({ ...newWorker, position: e.target.value as WorkerPosition })}
+                  className="w-full h-8 rounded-lg border border-input bg-transparent px-2.5 py-1 text-sm transition-colors outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+                >
+                  <option value="WORKER">Ишчи</option>
+                  <option value="DRIVER">Ҳайдовчи</option>
+                  <option value="OPERATOR">Оператор</option>
+                  <option value="SUPERVISOR">Назоратчи</option>
+                  <option value="MASTER">Уста</option>
+                </select>
+              </div>
+              <Button onClick={handleUpdateWorker} className="w-full">
+                Сақлаш
+              </Button>
+            </div>
+          </SheetContent>
+        </Sheet>
       </div>
 
       {/* Position Filter */}
@@ -152,13 +246,21 @@ export default function WorkerPage() {
                     {worker.name.slice(0, 2).toUpperCase()}
                   </span>
                 </div>
-                <button className="text-gray-400 hover:text-gray-600 transition-colors">
-                  <MoreVertical className="w-5 h-5" />
-                </button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button className="text-gray-400 hover:text-gray-600 transition-colors">
+                      <MoreVertical className="w-5 h-5" />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <DropdownMenuItem onClick={() => handleEditWorker(worker)}>Таҳрирлаш</DropdownMenuItem>
+                    <DropdownMenuItem className="text-red-600" onClick={() => handleDeleteWorker(worker)}>Ўчириш</DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
               <h3 className="font-semibold text-gray-900 mb-1">{worker.name}</h3>
               <span className="text-xs px-2 py-0.5 rounded-full border bg-indigo-100 text-indigo-600 border-indigo-200">
-                {worker.position}
+                {positionLabels[worker.position]}
               </span>
               <div className="flex items-center gap-2 mt-3 text-sm text-gray-500">
                 <Phone className="w-3.5 h-3.5" />

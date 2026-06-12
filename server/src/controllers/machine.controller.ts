@@ -5,7 +5,7 @@ import { TeamModel } from "../models/team.model.js";
 export const createMachine = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const machine = await MachineModel.create(req.body);
-        if(machine._id && machine.teamId) {
+        if(machine._id && machine.teamId && machine.teamId !== "") {
             await TeamModel.findByIdAndUpdate(machine.teamId, {
                 $set: { machine: machine._id }
             })
@@ -53,8 +53,8 @@ export const updateMachine = async (req: Request, res: Response, next: NextFunct
         }
         const machine = await MachineModel.findByIdAndUpdate(id, req.body, { new: true });
         
-        if (req.body.teamId && req.body.teamId !== oldMachine.teamId) {
-            if (oldMachine.teamId) {
+        if (req.body.teamId && req.body.teamId !== oldMachine.teamId && req.body.teamId !== "") {
+            if (oldMachine.teamId && oldMachine.teamId !== "") {
                 await TeamModel.findByIdAndUpdate(oldMachine.teamId, {
                     $set: { machine: null }
                 });
@@ -80,7 +80,7 @@ export const deleteMachine = async (req: Request, res: Response, next: NextFunct
         if (!machine) {
             return res.status(404).json({ success: false, error: "Machine not found" });
         }
-        if (machine.teamId) {
+        if (machine.teamId && machine.teamId !== "") {
             await TeamModel.findByIdAndUpdate(machine.teamId, {
                 $set: { machine: null }
             });

@@ -8,7 +8,7 @@ const wellSchema = new mongoose.Schema<IWell>({
     },
     length: {
         type: Number,
-        required: true
+        required: false,
     },
     except_length: {
         type: Number,
@@ -18,6 +18,8 @@ const wellSchema = new mongoose.Schema<IWell>({
         type: String,
         required: true
     },
+},{
+    timestamps: true,
 });
 
 export const Well = mongoose.model<IWell>("Well", wellSchema);

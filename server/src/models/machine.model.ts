@@ -9,7 +9,7 @@ const machineSchema = new mongoose.Schema<IMachineModel>({
     },
     teamId: {
         type: String,
-        required: true,
+        required: false,
         trim: true,
     },
     wells: [{
@@ -20,6 +20,8 @@ const machineSchema = new mongoose.Schema<IMachineModel>({
         enum: ["ACTIVE", "REPAIRING"],
         default: "ACTIVE",
     },
+},{
+    timestamps: true,
 });
 
 export const MachineModel = mongoose.model("Machine", machineSchema);

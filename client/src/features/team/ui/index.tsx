@@ -2,12 +2,18 @@
 
 import { useState } from "react";
 import { Users, Truck, MapPin, MoreVertical, Plus } from "lucide-react";
-import { useTeams, useCreateTeam } from "@/shared/lib/hooks/use-teams";
+import { useTeams, useCreateTeam, useUpdateTeam, useDeleteTeam } from "@/shared/lib/hooks/use-teams";
 import { useWorkers } from "@/shared/lib/hooks/use-workers";
 import { useMachines } from "@/shared/lib/hooks/use-machines";
 import { StatusBadge } from "@/shared/ui/StatusBadge";
 import { SkeletonCard } from "@/shared/ui/SkeletonCard";
 import { EmptyState } from "@/shared/ui/EmptyState";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/shared/ui/dropdown-menu";
 import { Team } from "@/shared/config/api/team.model";
 import { Worker } from "@/shared/config/api/worker.model";
 import { Machine } from "@/shared/config/api/machine.model";
@@ -20,7 +26,11 @@ export default function TeamPage() {
   const { data: workers } = useWorkers();
   const { data: machines } = useMachines();
   const createTeam = useCreateTeam();
+  const updateTeam = useUpdateTeam();
+  const deleteTeam = useDeleteTeam();
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editingTeam, setEditingTeam] = useState<Team | null>(null);
   const [newTeam, setNewTeam] = useState({ name: "", workersIds: [] as string[], machine: "", wells: [] as string[] });
 
   const handleAddTeam = async () => {
@@ -30,6 +40,33 @@ export default function TeamPage() {
       setNewTeam({ name: "", workersIds: [], machine: "", wells: [] });
     } catch (error) {
       console.error("Failed to add team:", error);
+    }
+  };
+
+  const handleEditTeam = (team: Team) => {
+    setEditingTeam(team);
+    setNewTeam({ name: team.name, workersIds: team.workersIds, machine: team.machine, wells: team.wells });
+    setIsEditModalOpen(true);
+  };
+
+  const handleUpdateTeam = async () => {
+    if (!editingTeam) return;
+    try {
+      await updateTeam.mutateAsync({ id: editingTeam._id, data: newTeam });
+      setIsEditModalOpen(false);
+      setEditingTeam(null);
+      setNewTeam({ name: "", workersIds: [], machine: "", wells: [] });
+    } catch (error) {
+      console.error("Failed to update team:", error);
+    }
+  };
+
+  const handleDeleteTeam = async (team: Team) => {
+    if (!confirm(`${team.name} жамоасини ўчирмоқчимисиз?`)) return;
+    try {
+      await deleteTeam.mutateAsync(team._id);
+    } catch (error) {
+      console.error("Failed to delete team:", error);
     }
   };
 
@@ -89,6 +126,41 @@ export default function TeamPage() {
             </div>
           </SheetContent>
         </Sheet>
+
+        {/* Edit Team Modal */}
+        <Sheet open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
+          <SheetContent>
+            <SheetHeader>
+              <SheetTitle>Жамоани таҳрирлаш</SheetTitle>
+            </SheetHeader>
+            <div className="space-y-4 mt-4">
+              <div>
+                <label className="text-sm font-medium text-gray-700 mb-1 block">Жамоа номи</label>
+                <Input
+                  value={newTeam.name}
+                  onChange={(e) => setNewTeam({ ...newTeam, name: e.target.value })}
+                  placeholder="Жамоа номини киритинг"
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-700 mb-1 block">Машина</label>
+                <select
+                  value={newTeam.machine}
+                  onChange={(e) => setNewTeam({ ...newTeam, machine: e.target.value })}
+                  className="w-full h-8 rounded-lg border border-input bg-transparent px-2.5 py-1 text-sm transition-colors outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+                >
+                  <option value="">Машинани танланг</option>
+                  {Array.isArray(machines) && machines.map(machine => (
+                    <option key={machine._id} value={machine._id}>{machine.number}</option>
+                  ))}
+                </select>
+              </div>
+              <Button onClick={handleUpdateTeam} className="w-full">
+                Сақлаш
+              </Button>
+            </div>
+          </SheetContent>
+        </Sheet>
       </div>
 
       {Array.isArray(teams) && teams.length > 0 ? (
@@ -104,9 +176,17 @@ export default function TeamPage() {
                     <h3 className="font-semibold text-lg text-gray-900">{team.name}</h3>
                     <p className="text-xs text-gray-500">{team.workersIds.length} ishchi · {team.wells.length} quduq</p>
                   </div>
-                  <button className="text-gray-400 hover:text-gray-600 transition-colors">
-                    <MoreVertical className="w-5 h-5" />
-                  </button>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <button className="text-gray-400 hover:text-gray-600 transition-colors">
+                        <MoreVertical className="w-5 h-5" />
+                      </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                      <DropdownMenuItem onClick={() => handleEditTeam(team)}>Таҳрирлаш</DropdownMenuItem>
+                      <DropdownMenuItem className="text-red-600" onClick={() => handleDeleteTeam(team)}>Ўчириш</DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
 
                 {/* Machine */}

@@ -7,6 +7,8 @@ const wareTransactionSchema = new mongoose.Schema<IWareTransactionModel>({
     type: { type: String, enum: ["INCOME", "OUTCOME"], required: true },
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now },
+},{
+    timestamps: true,
 });
 
 export const WareTransaction = mongoose.model<IWareTransactionModel>("WareTransaction", wareTransactionSchema);

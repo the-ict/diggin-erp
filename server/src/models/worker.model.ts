@@ -9,6 +9,8 @@ const workerSchema = new mongoose.Schema<IWorkerModel>({
         required: false,
     },
     position: String,
+}, {
+    timestamps: true,
 });
 
 export const WorkerModel = mongoose.model("Worker", workerSchema);

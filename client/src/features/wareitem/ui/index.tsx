@@ -2,9 +2,15 @@
 
 import { useState } from "react";
 import { Package, MoreVertical, Plus, AlertTriangle } from "lucide-react";
-import { useWareItems, useCreateWareItem } from "@/shared/lib/hooks/use-ware-items";
+import { useWareItems, useCreateWareItem, useUpdateWareItem, useDeleteWareItem } from "@/shared/lib/hooks/use-ware-items";
 import { SkeletonCard } from "@/shared/ui/SkeletonCard";
 import { EmptyState } from "@/shared/ui/EmptyState";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/shared/ui/dropdown-menu";
 import { WareItem } from "@/shared/config/api/wareItem.model";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/shared/ui/sheet";
 import { Button } from "@/shared/ui/button";
@@ -13,8 +19,12 @@ import { Input } from "@/shared/ui/input";
 export default function WareItemPage() {
   const { data: wareItems, isLoading } = useWareItems();
   const createWareItem = useCreateWareItem();
+  const updateWareItem = useUpdateWareItem();
+  const deleteWareItem = useDeleteWareItem();
   const [filterStock, setFilterStock] = useState<string>("ALL");
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editingWareItem, setEditingWareItem] = useState<WareItem | null>(null);
   const [newWareItem, setNewWareItem] = useState({ name: "", quantity: 0 });
 
   const MINIMUM_QUANTITY = 10;
@@ -41,6 +51,33 @@ export default function WareItemPage() {
       setNewWareItem({ name: "", quantity: 0 });
     } catch (error) {
       console.error("Failed to add ware item:", error);
+    }
+  };
+
+  const handleEditWareItem = (item: WareItem) => {
+    setEditingWareItem(item);
+    setNewWareItem({ name: item.name, quantity: item.quantity });
+    setIsEditModalOpen(true);
+  };
+
+  const handleUpdateWareItem = async () => {
+    if (!editingWareItem) return;
+    try {
+      await updateWareItem.mutateAsync({ id: editingWareItem._id, data: newWareItem });
+      setIsEditModalOpen(false);
+      setEditingWareItem(null);
+      setNewWareItem({ name: "", quantity: 0 });
+    } catch (error) {
+      console.error("Failed to update ware item:", error);
+    }
+  };
+
+  const handleDeleteWareItem = async (item: WareItem) => {
+    if (!confirm(`${item.name} маҳсулотини ўчирмоқчимисиз?`)) return;
+    try {
+      await deleteWareItem.mutateAsync(item._id);
+    } catch (error) {
+      console.error("Failed to delete ware item:", error);
     }
   };
 
@@ -96,6 +133,37 @@ export default function WareItemPage() {
             </div>
           </SheetContent>
         </Sheet>
+
+        <Sheet open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
+          <SheetContent>
+            <SheetHeader>
+              <SheetTitle>Қудуқни таҳрирлаш</SheetTitle>
+            </SheetHeader>
+            <div className="space-y-4 mt-4">
+              <div>
+                <label className="text-sm font-medium text-gray-700 mb-1 block">Жамоа</label>
+                <input
+                  value={newWareItem.name}
+                  onChange={(e) => setNewWareItem({ ...newWareItem, name: e.target.value })}
+                  className="w-full h-8 rounded-lg border border-input bg-transparent px-2.5 py-1 text-sm transition-colors outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-700 mb-1 block">Кутилаётган узунлик (м)</label>
+                <Input
+                  value={newWareItem.quantity}
+                  onChange={(e) => setNewWareItem({ ...newWareItem, quantity: Number(e.target.value) })}
+                  placeholder="Кутилаётган узунликни киритинг"
+                  type="number"
+                />
+              </div>
+
+              <Button onClick={handleUpdateWareItem} className="w-full">
+                Сақлаш
+              </Button>
+            </div>
+          </SheetContent>
+        </Sheet>
       </div>
 
       {/* Stock Filter */}
@@ -104,11 +172,10 @@ export default function WareItemPage() {
           <button
             key={status}
             onClick={() => setFilterStock(status)}
-            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-              filterStock === status
+            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${filterStock === status
                 ? "bg-indigo-500 text-white"
                 : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"
-            }`}
+              }`}
           >
             {stockLabels[status]}
           </button>

@@ -17,6 +17,8 @@ const teamSchema = new mongoose.Schema<ITeamModel>({
         type: String,
         required: false,
     }]
+},{
+    timestamps: true,
 });
 
 export const TeamModel = mongoose.model("Team", teamSchema);

@@ -10,7 +10,7 @@ const createWorkerValidator = Joi.object({
 const updateWorkerValidator = Joi.object({
     name: Joi.string().optional(),
     phone: Joi.string().optional(),
-    teamId: Joi.string().optional(),
+    teamId: Joi.string().optional().allow(""),
     position: Joi.string().valid("DRIVER", "OPERATOR", "WORKER", "SUPERVISOR", "MASTER").optional(),
 }).min(1);
 
