@@ -5,7 +5,11 @@ import {
 import { MenuItem } from '../lib/model';
 import { useTranslations } from 'next-intl';
 
-const RenderMenuItem = (item: MenuItem) => {
+interface RenderMenuItemProps {
+  item: MenuItem;
+}
+
+const RenderMenuItem = ({ item }: RenderMenuItemProps) => {
   const t = useTranslations();
 
   return (

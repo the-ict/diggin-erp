@@ -41,7 +41,7 @@ const Navbar = () => {
             <div className="flex items-center">
               <NavigationMenu>
                 <NavigationMenuList>
-                  {filteredMenu.map((item) => RenderMenuItem(item))}
+                  {filteredMenu.map((item) => <RenderMenuItem key={item.title} item={item} />)}
                 </NavigationMenuList>
               </NavigationMenu>
             </div>
@@ -80,7 +80,7 @@ const Navbar = () => {
                 </SheetHeader>
                 <div className="flex flex-col gap-6 p-4">
                   <div className="flex w-full flex-col gap-4">
-                    {filteredMenu.map((item) => RenderMobileMenuItem(item))}
+                    {filteredMenu.map((item) => <RenderMobileMenuItem key={item.title} item={item} />)}
                   </div>
                   {user && (
                     <Button variant="outline" onClick={logout} className="w-full">

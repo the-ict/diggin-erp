@@ -1,6 +1,6 @@
 "use client";
 
-import { TrendingUp, TrendingDown, Layers, MapPin, Package, Drill } from "lucide-react";
+import { TrendingUp, TrendingDown, MapPin, Package, Drill } from "lucide-react";
 import { WareTransaction } from "@/shared/config/api/wareTransaction.model";
 import { useWareTransactions } from "@/shared/lib/hooks/use-ware-transactions";
 import { useTransactions } from "@/shared/lib/hooks/use-transactions";
@@ -34,23 +34,28 @@ export default function MainPage() {
   const t = useTranslations("Dashboard");
   const tWells = useTranslations("Wells");
   const tCommon = useTranslations("Common");
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, isLoading } = useAuth();
   const router = useRouter();
 
-  useEffect(() => {
-    if (!isAuthenticated) {
-      router.push("/login");
-    }
-  }, [isAuthenticated, router]);
-
-  if (!isAuthenticated) {
-    return null;
-  }
-
+  // Call all hooks before any early returns
   const { data: transactions, isLoading: transactionsLoading } = useTransactions();
   const { data: wareTransactions, isLoading: wareTransactionsLoading } = useWareTransactions();
   const { data: wells, isLoading: wellsLoading } = useWells();
   const { data: wareItems, isLoading: wareItemsLoading } = useWareItems();
+
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      router.push("/login");
+    }
+  }, [isAuthenticated, isLoading, router]);
+
+  if (isLoading) {
+    return null;
+  }
+
+  if (!isAuthenticated) {
+    return null;
+  }
 
   // Filter wells by team for WORKER role
   const filteredWells = user?.role === "WORKER" && user.teamId
