@@ -28,7 +28,10 @@ export function useUpdateMachine() {
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: UpdateMachineDto }) =>
       machineRequests.update(id, data),
-    onSuccess: () => qc.invalidateQueries({ queryKey: MACHINE_KEYS.all }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: MACHINE_KEYS.all });
+      window.location.reload();
+    },
   });
 }
 

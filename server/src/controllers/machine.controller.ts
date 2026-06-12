@@ -84,7 +84,7 @@ export const deleteMachine = async (req: Request, res: Response, next: NextFunct
             await TeamModel.findByIdAndUpdate(machine.teamId, {
                 $set: { machine: null }
             });
-        }
+        };
         res.json({ success: true, data: machine });
     } catch (error) {
         next(error);

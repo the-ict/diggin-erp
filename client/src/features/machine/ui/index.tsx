@@ -2,13 +2,14 @@
 
 import { useState } from "react";
 import { Truck, MoreVertical, Plus, AlertCircle } from "lucide-react";
-import { useMachines, useCreateMachine } from "@/shared/lib/hooks/use-machines";
-import { useTeams } from "@/shared/lib/hooks/use-teams";
-import { StatusBadge } from "@/shared/ui/StatusBadge";
-import { SkeletonCard } from "@/shared/ui/SkeletonCard";
-import { EmptyState } from "@/shared/ui/EmptyState";
-import { Machine, MachineStatus } from "@/shared/config/api/machine.model";
+import { useMachines, useCreateMachine, useUpdateMachine, useDeleteMachine } from "@/shared/lib/hooks/use-machines";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/shared/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/shared/ui/sheet";
+import { Machine, MachineStatus } from "@/shared/config/api/machine.model";
+import { useTeams } from "@/shared/lib/hooks/use-teams";
+import { SkeletonCard } from "@/shared/ui/SkeletonCard";
+import { StatusBadge } from "@/shared/ui/StatusBadge";
+import { EmptyState } from "@/shared/ui/EmptyState";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
 
@@ -16,11 +17,16 @@ export default function MachinePage() {
   const { data: machines, isLoading } = useMachines();
   const { data: teams } = useTeams();
   const createMachine = useCreateMachine();
+  const updateMachine = useUpdateMachine();
+  const deleteMachine = useDeleteMachine();
   const [filterStatus, setFilterStatus] = useState<string>("ALL");
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [newMachine, setNewMachine] = useState({ number: "", status: "ACTIVE" as MachineStatus, teamId: "", wells: [] as string[] });
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editingMachine, setEditingMachine] = useState<Machine | null>(null);
 
-  const filteredMachines = Array.isArray(machines) ? machines.filter(machine => 
+
+  const filteredMachines = Array.isArray(machines) ? machines.filter(machine =>
     filterStatus === "ALL" || machine.status === filterStatus
   ) : [];
 
@@ -42,6 +48,26 @@ export default function MachinePage() {
     }
   };
 
+  const handleUpdateMachine = async () => {
+    if(!editingMachine) return;
+    try {
+      await updateMachine.mutateAsync({ id: editingMachine._id, data: newMachine });
+    } catch (error) {
+      console.log("Failed to update machine:", error);
+    };
+  };
+
+  const handleDeleteMachine = async (machine: Machine) => {
+    if (!confirm("Машини ўчирмоқчимисиз?")) return;
+    try {
+      await deleteMachine.mutateAsync(machine._id);
+      setEditingMachine(null);
+      setIsEditModalOpen(false);
+      setNewMachine({ number: "", status: "ACTIVE", teamId: "", wells: [] });
+    } catch (error) {
+      console.log("Failed to delete machine:", error);
+    };
+  }
   if (isLoading) {
     return (
       <div className="custom-container space-y-6">
@@ -109,6 +135,29 @@ export default function MachinePage() {
             </div>
           </SheetContent>
         </Sheet>
+
+        {/* Edit Machine Modal */}
+        <Sheet open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
+          <SheetContent>
+            <SheetHeader>
+              <SheetTitle>Машинани таҳрирлаш</SheetTitle>
+            </SheetHeader>
+            <div className="space-y-4 mt-4">
+              <div>
+                <label className="text-sm font-medium text-gray-700 mb-1 block">Машина рақами</label>
+                <Input
+                  type="text"
+                  value={newMachine.number}
+                  onChange={(e) => setNewMachine({ ...newMachine, number: e.target.value })}
+                  className="w-full h-8 rounded-lg border border-input bg-transparent px-2.5 py-1 text-sm transition-colors outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+                />
+              </div>
+              <Button onClick={handleUpdateMachine} className="w-full">
+                Сақлаш
+              </Button>
+            </div>
+          </SheetContent>
+        </Sheet>
       </div>
 
       {/* Status Filter */}
@@ -117,11 +166,10 @@ export default function MachinePage() {
           <button
             key={status}
             onClick={() => setFilterStatus(status)}
-            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-              filterStatus === status
-                ? "bg-indigo-500 text-white"
-                : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"
-            }`}
+            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${filterStatus === status
+              ? "bg-indigo-500 text-white"
+              : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"
+              }`}
           >
             {statusLabels[status]}
           </button>
@@ -139,9 +187,24 @@ export default function MachinePage() {
                   <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center">
                     <Truck className="w-5 h-5 text-gray-500" />
                   </div>
-                  <button className="text-gray-400 hover:text-gray-600 transition-colors">
-                    <MoreVertical className="w-5 h-5" />
-                  </button>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <button className="text-gray-400 hover:text-gray-600 transition-colors">
+                        <MoreVertical className="w-5 h-5" />
+                      </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                      <DropdownMenuItem onClick={() => {
+                        setIsEditModalOpen(true);
+                        setEditingMachine(machine);
+                        setNewMachine({
+                          number:machine.number,
+                          status: machine.status
+                        } as Machine)
+                      }}>Таҳрирлаш</DropdownMenuItem>
+                      <DropdownMenuItem className="text-red-600" onClick={() => handleDeleteMachine(machine)}>Ўчириш</DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
                 <h3 className="font-mono text-xl font-semibold text-gray-900 mt-3">{machine.number}</h3>
                 <StatusBadge status={machine.status} className="mt-2" />
