@@ -16,7 +16,7 @@ export const createWell = async (req: Request, res: Response, next: NextFunction
             }, {
                 $addToSet: { wells: well._id }
             });
-        };
+        }
         res.status(201).json({ success: true, data: well });
     } catch (error) {
         next(error);

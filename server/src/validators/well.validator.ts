@@ -3,6 +3,7 @@ import Joi from "joi";
 const createWellValidator = Joi.object({
     team: Joi.string().required(),
     except_length: Joi.number().required().min(0),
+    length: Joi.number().optional().min(0),
     status: Joi.string().valid("DUGGING", "FINISHED", "SUCCESSFUL", "FAILED").required(),
 });
 
