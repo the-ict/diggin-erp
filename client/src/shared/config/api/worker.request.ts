@@ -7,7 +7,8 @@ export const workerRequests = {
   getAll: async (): Promise<Worker[]> => {
     const res = await fetch(URLS.workers);
     if (!res.ok) throw new Error("Failed to fetch workers");
-    return res.json();
+    const json = await res.json();
+    return json.data || [];
   },
 
   getOne: async (id: string): Promise<Worker> => {

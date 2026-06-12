@@ -7,7 +7,8 @@ export const machineRequests = {
   getAll: async (): Promise<Machine[]> => {
     const res = await fetch(URLS.machines);
     if (!res.ok) throw new Error("Failed to fetch machines");
-    return res.json();
+    const json = await res.json();
+    return json.data || [];
   },
 
   getOne: async (id: string): Promise<Machine> => {

@@ -7,7 +7,8 @@ export const teamRequests = {
   getAll: async (): Promise<Team[]> => {
     const res = await fetch(URLS.teams);
     if (!res.ok) throw new Error("Failed to fetch teams");
-    return res.json();
+    const json = await res.json();
+    return json.data || [];
   },
 
   getOne: async (id: string): Promise<Team> => {

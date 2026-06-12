@@ -25,6 +25,7 @@ const app = express();
 
 // middlewares
 app.use(helmet());
+app.use(express.json());
 app.use(morgan("combined"));
 app.use(cors({
     origin: ["http://localhost:5000", "http://localhost:3001"],

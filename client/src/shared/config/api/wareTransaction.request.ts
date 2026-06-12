@@ -7,7 +7,8 @@ export const wareTransactionRequests = {
   getAll: async (): Promise<WareTransaction[]> => {
     const res = await fetch(URLS.wareTransactions);
     if (!res.ok) throw new Error("Failed to fetch ware transactions");
-    return res.json();
+    const json = await res.json();
+    return json.data || [];
   },
 
   getOne: async (id: string): Promise<WareTransaction> => {

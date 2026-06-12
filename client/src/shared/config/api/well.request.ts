@@ -7,7 +7,8 @@ export const wellRequests = {
   getAll: async (): Promise<Well[]> => {
     const res = await fetch(URLS.wells);
     if (!res.ok) throw new Error("Failed to fetch wells");
-    return res.json();
+    const json = await res.json();
+    return json.data || [];
   },
 
   getOne: async (id: string): Promise<Well> => {

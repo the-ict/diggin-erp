@@ -3,7 +3,7 @@ import Joi from "joi";
 const createWorkerValidator = Joi.object({
     name: Joi.string().required(),
     phone: Joi.string().required(),
-    teamId: Joi.string().optional(),
+    teamId: Joi.string().optional().allow(""),
     position: Joi.string().valid("DRIVER", "OPERATOR", "WORKER", "SUPERVISOR","MASTER").required(),
 });
 
