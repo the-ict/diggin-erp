@@ -5,7 +5,6 @@ const createTransactionValidator = Joi.object({
     currency: Joi.string().valid("UZS", "USD").required(),
     type: Joi.string().valid("INCOME", "OUTCOME").required(),
     note: Joi.string().optional(),
-    transferredX: Joi.string().required(),
 });
 
 const updateTransactionValidator = Joi.object({
@@ -13,7 +12,6 @@ const updateTransactionValidator = Joi.object({
     currency: Joi.string().valid("UZS", "USD").optional(),
     type: Joi.string().valid("INCOME", "OUTCOME").optional(),
     note: Joi.string().optional(),
-    transferredX: Joi.string().optional(),
 }).min(1);
 
 export {

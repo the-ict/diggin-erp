@@ -1,18 +1,35 @@
 "use client";
 
 import { useState } from "react";
-import { ArrowLeftRight, MoreVertical, Plus, DollarSign } from "lucide-react";
-import { useTransactions } from "@/shared/lib/hooks/use-transactions";
+import { MoreVertical, Plus, DollarSign } from "lucide-react";
+import { useCreateTransaction, useDeleteTransaction, useTransactions, useUpdateTransaction } from "@/shared/lib/hooks/use-transactions";
 import { StatusBadge } from "@/shared/ui/StatusBadge";
 import { SkeletonCard } from "@/shared/ui/SkeletonCard";
 import { EmptyState } from "@/shared/ui/EmptyState";
-import { Transaction, TransactionType } from "@/shared/config/api/transaction.model";
+import { CreateTransactionDto, Transaction, TransactionType } from "@/shared/config/api/transaction.model";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/shared/ui/dropdown-menu";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/shared/ui/sheet";
+import { Input } from "@/shared/ui/input";
+import { Button } from "@/shared/ui/button";
 
 export default function TransactionPage() {
   const { data: transactions, isLoading } = useTransactions();
+  const createTransaction = useCreateTransaction();
+  const updateTransaction = useUpdateTransaction();
+  const deleteTransaction = useDeleteTransaction();
+
+  const [editingTransaction, setEditingTransaction] = useState<Transaction>();
+  const [isAddTransactionModalOpen, setIsAddTransactionModalOpen] = useState(false);
+  const [isEditTransactionModalOpen, setIsEditTransactionModalOpen] = useState(false);
+  const [newTransaction, setNewTransaction] = useState<CreateTransactionDto>({
+    amount: 0,
+    currency: "UZS",
+    type: "INCOME",
+    note: "",
+  });
   const [filterType, setFilterType] = useState<string>("ALL");
 
-  const filteredTransactions = transactions?.filter(transaction => 
+  const filteredTransactions = transactions?.filter(transaction =>
     filterType === "ALL" || transaction.type === filterType
   );
 
@@ -25,6 +42,33 @@ export default function TransactionPage() {
     return new Intl.NumberFormat('uz-UZ').format(amount);
   };
 
+  const handleUpdateTransaction = async () => {
+    if (!editingTransaction?._id) return;
+    try {
+      await updateTransaction.mutateAsync({ id: editingTransaction?._id, data: newTransaction })
+      setIsEditTransactionModalOpen(false);
+    } catch (error) {
+      console.log("failed to update transaction: ", error);
+    }
+  };
+
+  const handleDeleteTransaction = async (transaction: Transaction) => {
+    try {
+      await deleteTransaction.mutateAsync(transaction._id);
+    } catch (error) {
+      console.log("failed to delete transaction: ", error);
+    }
+  };
+
+  const handleAddTransaction = async () => {
+    try {
+      await createTransaction.mutateAsync(newTransaction);
+      setIsAddTransactionModalOpen(false);
+    } catch (error) {
+      console.log("failed to add transaction: ", error);
+    }
+  }
+
   if (isLoading) {
     return (
       <div className="custom-container space-y-6">
@@ -36,16 +80,129 @@ export default function TransactionPage() {
         </div>
       </div>
     );
-  }
+  };
 
   return (
     <div className="custom-container space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold tracking-tight text-gray-900">Транзакциялар</h1>
-        <button className="flex items-center gap-2 px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg transition-colors">
-          <Plus className="w-4 h-4" />
-          <span>Qo'shish</span>
-        </button>
+
+        <Sheet open={isAddTransactionModalOpen} onOpenChange={setIsAddTransactionModalOpen}>
+          <SheetTrigger asChild>
+            <button className="flex items-center gap-2 px-3 py-1.5 bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg transition-colors text-sm">
+              <Plus className="w-4 h-4" />
+              <span>Qo'shish</span>
+            </button>
+          </SheetTrigger>
+          <SheetContent>
+            <SheetHeader>
+              <SheetTitle>Транзакция қўшиш</SheetTitle>
+            </SheetHeader>
+            <div className="space-y-4 mt-4">
+              <div>
+                <label className="text-sm font-medium text-gray-700 mb-1 block">Narxi</label>
+                <Input
+                  value={newTransaction.amount}
+                  onChange={(e) => setNewTransaction({ ...newTransaction, amount: Number(e.target.value) })}
+                  placeholder="Кутилаётган узунликни киритинг"
+                  type="number"
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-700 mb-1 block">Turi</label>
+                <select
+                  value={newTransaction.type}
+                  onChange={(e) => setNewTransaction({ ...newTransaction, type: e.target.value as TransactionType })}
+                  className="w-full h-8 rounded-lg border border-input bg-transparent px-2.5 py-1 text-sm transition-colors outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+                >
+                  <option value="">Жамоани танланг</option>
+                  {["INCOME", "OUTCOME"].map(type => (
+                    <option key={type} value={type}>{type == "INCOME" ? "Кирим" : "Чиқим"}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="text-sm font-medium text-gray-700 mb-1 block">Pul turi</label>
+                <select
+                  value={newTransaction.currency}
+                  onChange={(e) => setNewTransaction({ ...newTransaction, currency: e.target.value as "USD" | "UZS" })}
+                  className="w-full h-8 rounded-lg border border-input bg-transparent px-2.5 py-1 text-sm transition-colors outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+                >
+                  <option value="USD">Dollar</option>
+                  <option value="UZS">O'zbek so'mi</option>
+                </select>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-700 mb-1 block">Eslatma</label>
+                <Input
+                  value={newTransaction.note}
+                  onChange={(e) => setNewTransaction({ ...newTransaction, note: e.target.value })}
+                  placeholder="Eslatma"
+                />
+              </div>
+              <Button onClick={handleAddTransaction} className="w-full">
+                Қўшиш
+              </Button>
+            </div>
+          </SheetContent>
+        </Sheet>
+
+        {/* Edit Well Modal */}
+        <Sheet open={isEditTransactionModalOpen} onOpenChange={setIsEditTransactionModalOpen}>
+          <SheetContent>
+            <SheetHeader>
+              <SheetTitle>Транзакцияни таҳрирлаш</SheetTitle>
+            </SheetHeader>
+            <div className="space-y-4 mt-4">
+              <div>
+                <label className="text-sm font-medium text-gray-700 mb-1 block">Narxi</label>
+                <Input
+                  value={newTransaction.amount}
+                  onChange={(e) => setNewTransaction({ ...newTransaction, amount: Number(e.target.value) })}
+                  placeholder="Кутилаётган узунликни киритинг"
+                  type="number"
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-700 mb-1 block">Turi</label>
+                <select
+                  value={newTransaction.type}
+                  onChange={(e) => setNewTransaction({ ...newTransaction, type: e.target.value as TransactionType })}
+                  className="w-full h-8 rounded-lg border border-input bg-transparent px-2.5 py-1 text-sm transition-colors outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+                >
+                  <option value="">Жамоани танланг</option>
+                  {["INCOME", "OUTCOME"].map(type => (
+                    <option key={type} value={type}>{type == "INCOME" ? "Кирим" : "Чиқим"}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="text-sm font-medium text-gray-700 mb-1 block">Pul turi</label>
+                <select
+                  value={newTransaction.currency}
+                  onChange={(e) => setNewTransaction({ ...newTransaction, currency: e.target.value as "USD" | "UZS" })}
+                  className="w-full h-8 rounded-lg border border-input bg-transparent px-2.5 py-1 text-sm transition-colors outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+                >
+                  <option value="USD">Dollar</option>
+                  <option value="UZS">O'zbek soni</option>
+                </select>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-700 mb-1 block">Eslatma</label>
+                <Input
+                  value={newTransaction.note}
+                  onChange={(e) => setNewTransaction({ ...newTransaction, note: e.target.value })}
+                  placeholder="Eslatma"
+                />
+              </div>
+              <Button onClick={handleUpdateTransaction} className="w-full">
+                Tаҳрирлаш
+              </Button>
+            </div>
+          </SheetContent>
+        </Sheet>
       </div>
 
       {/* Summary Cards */}
@@ -80,11 +237,10 @@ export default function TransactionPage() {
           <button
             key={type}
             onClick={() => setFilterType(type)}
-            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-              filterType === type
-                ? "bg-indigo-500 text-white"
-                : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"
-            }`}
+            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${filterType === type
+              ? "bg-indigo-500 text-white"
+              : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"
+              }`}
           >
             {type}
           </button>
@@ -93,7 +249,7 @@ export default function TransactionPage() {
 
       {/* Transactions Table */}
       {filteredTransactions && filteredTransactions.length > 0 ? (
-        <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
+        <div className="bg-white border border-gray-200 rounded-xl overflow-x-auto shadow-sm">
           <table className="w-full">
             <thead>
               <tr className="border-b border-gray-200 text-xs text-gray-500 uppercase tracking-wider">
@@ -116,9 +272,26 @@ export default function TransactionPage() {
                     {new Date(transaction.createdAt).toLocaleDateString('uz-UZ')}
                   </td>
                   <td className="py-3.5 text-right px-6">
-                    <button className="text-gray-400 hover:text-gray-600 transition-colors">
-                      <MoreVertical className="w-5 h-5" />
-                    </button>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <button className="text-gray-400 hover:text-gray-600 transition-colors">
+                          <MoreVertical className="w-5 h-5" />
+                        </button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent>
+                        <DropdownMenuItem onClick={() => {
+                          setNewTransaction({
+                            amount: transaction.amount,
+                            currency: transaction.currency,
+                            type: transaction.type,
+                            note: transaction.note || "",
+                          });
+                          setEditingTransaction(transaction);
+                          setIsEditTransactionModalOpen(true);
+                        }}>Таҳрирлаш</DropdownMenuItem>
+                        <DropdownMenuItem className="text-red-600" onClick={() => handleDeleteTransaction(transaction)}>Ўчириш</DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </td>
                 </tr>
               ))}

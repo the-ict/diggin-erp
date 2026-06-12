@@ -256,3 +256,7 @@
 {"level":"info","message":"Server is running on port 3000","timestamp":"2026-06-12T05:50:44.303Z"}
 {"level":"info","message":"mongodb connected successfully","timestamp":"2026-06-12T06:31:07.252Z"}
 {"level":"info","message":"Server is running on port 3000","timestamp":"2026-06-12T06:31:07.259Z"}
+{"level":"info","message":"mongodb connected successfully","timestamp":"2026-06-12T06:53:52.241Z"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2026-06-12T06:53:52.248Z"}
+{"level":"info","message":"mongodb connected successfully","timestamp":"2026-06-12T06:54:01.807Z"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2026-06-12T06:54:01.819Z"}
