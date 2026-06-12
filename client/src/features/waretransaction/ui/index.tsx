@@ -1,25 +1,42 @@
 "use client";
 
 import { useState } from "react";
-import { ArrowLeftRight, MoreVertical, Plus, Calendar } from "lucide-react";
+import { MoreVertical, Plus } from "lucide-react";
 import { useWareTransactions } from "@/shared/lib/hooks/use-ware-transactions";
 import { useWareItems } from "@/shared/lib/hooks/use-ware-items";
 import { StatusBadge } from "@/shared/ui/StatusBadge";
 import { SkeletonCard } from "@/shared/ui/SkeletonCard";
 import { EmptyState } from "@/shared/ui/EmptyState";
 import { WareTransaction, WareTransactionType } from "@/shared/config/api/wareTransaction.model";
-import { WareItem } from "@/shared/config/api/wareItem.model";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/shared/ui/sheet";
+import { Input } from "@/shared/ui/input";
+import { Button } from "@/shared/ui/button";
 
 export default function WareTransactionPage() {
   const { data: transactions, isLoading } = useWareTransactions();
-  const { data: wareItems } = useWareItems();
   const [filterType, setFilterType] = useState<string>("ALL");
+  const { data: wareItems } = useWareItems();
+  const [editingTransaction, setEditingTransaction] = useState<WareTransaction | null>(null);
+  const [isEditingModal, setIsEditingModal] = useState<boolean>(false);
+  const [newTransaction, setNewTransaction] = useState({
+
+  });
 
   const filteredTransactions = transactions?.filter(transaction => 
     filterType === "ALL" || transaction.type === filterType
   );
 
   const types: (WareTransactionType | "ALL")[] = ["ALL", "INCOME", "OUTCOME"];
+
+  const handleUpdateTransaction = (transaction: WareTransaction) => {
+    // TODO: Implement update transaction logic
+    console.log("Updating transaction:", transaction);
+  };
+
+  const handleDeleteTransaction = (transaction: WareTransaction) => {
+    // TODO: Implement delete transaction logic
+    console.log("Deleting transaction:", transaction);
+  };
 
   if (isLoading) {
     return (
@@ -38,7 +55,7 @@ export default function WareTransactionPage() {
     <div className="custom-container space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold tracking-tight text-gray-900">Омбор Транзакциялари</h1>
-        <button className="flex items-center gap-2 px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg transition-colors">
+        <button className="flex items-center gap-2 px-4 py-1 cursor-pointer bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg transition-colors">
           <Plus className="w-4 h-4" />
           <span>Qo'shish</span>
         </button>
