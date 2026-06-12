@@ -134,14 +134,15 @@ export default function WareItemPage() {
           </SheetContent>
         </Sheet>
 
+        {/* Edit Ware item Modal */}
         <Sheet open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
           <SheetContent>
             <SheetHeader>
-              <SheetTitle>Қудуқни таҳрирлаш</SheetTitle>
+              <SheetTitle>Махсулотни таҳрирлаш</SheetTitle>
             </SheetHeader>
             <div className="space-y-4 mt-4">
               <div>
-                <label className="text-sm font-medium text-gray-700 mb-1 block">Жамоа</label>
+                <label className="text-sm font-medium text-gray-700 mb-1 block">Махсулот номи</label>
                 <input
                   value={newWareItem.name}
                   onChange={(e) => setNewWareItem({ ...newWareItem, name: e.target.value })}
@@ -149,11 +150,11 @@ export default function WareItemPage() {
                 />
               </div>
               <div>
-                <label className="text-sm font-medium text-gray-700 mb-1 block">Кутилаётган узунлик (м)</label>
+                <label className="text-sm font-medium text-gray-700 mb-1 block">Миқдор</label>
                 <Input
                   value={newWareItem.quantity}
                   onChange={(e) => setNewWareItem({ ...newWareItem, quantity: Number(e.target.value) })}
-                  placeholder="Кутилаётган узунликни киритинг"
+                  placeholder="Миқдорни киритинг"
                   type="number"
                 />
               </div>
@@ -173,8 +174,8 @@ export default function WareItemPage() {
             key={status}
             onClick={() => setFilterStock(status)}
             className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${filterStock === status
-                ? "bg-indigo-500 text-white"
-                : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"
+              ? "bg-indigo-500 text-white"
+              : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"
               }`}
           >
             {stockLabels[status]}
@@ -193,9 +194,17 @@ export default function WareItemPage() {
                   <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center">
                     <Package className="w-5 h-5 text-gray-500" />
                   </div>
-                  <button className="text-gray-400 hover:text-gray-600 transition-colors">
-                    <MoreVertical className="w-5 h-5" />
-                  </button>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <button className="text-gray-400 hover:text-gray-600 transition-colors">
+                        <MoreVertical className="w-5 h-5" />
+                      </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                      <DropdownMenuItem onClick={() => handleEditWareItem(item)}>Таҳрирлаш</DropdownMenuItem>
+                      <DropdownMenuItem className="text-red-600" onClick={() => handleDeleteWareItem(item)}>Ўчириш</DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
                 <h3 className="font-semibold text-gray-900">{item.name}</h3>
                 <div className="mt-4 pt-4">
