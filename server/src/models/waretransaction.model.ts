@@ -4,8 +4,12 @@ import type { IWareTransactionModel } from "../types/waretransaction.types.js";
 const wareTransactionSchema = new mongoose.Schema<IWareTransactionModel>({
     wareItemId: { type: String, required: true },
     quantity: { type: Number, required: true },
-    type: { type: String, enum: ["INCOME", "OUTCOME"], required: true }
-},{
+    type: { type: String, enum: ["INCOME", "OUTCOME"], required: true },
+    givenToWorker: {
+        type: String,
+        required: true,
+    }
+}, {
     timestamps: true,
 });
 

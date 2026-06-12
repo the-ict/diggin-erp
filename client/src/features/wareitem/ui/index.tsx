@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Package, MoreVertical, Plus, AlertTriangle } from "lucide-react";
+import { Package, MoreVertical, Plus, AlertTriangle, Check } from "lucide-react";
 import { useWareItems, useCreateWareItem, useUpdateWareItem, useDeleteWareItem } from "@/shared/lib/hooks/use-ware-items";
 import { SkeletonCard } from "@/shared/ui/SkeletonCard";
 import { EmptyState } from "@/shared/ui/EmptyState";
@@ -15,9 +15,11 @@ import { WareItem } from "@/shared/config/api/wareItem.model";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/shared/ui/sheet";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
+import { useWorkers } from "@/shared/lib/hooks/use-workers";
 
 export default function WareItemPage() {
   const { data: wareItems, isLoading } = useWareItems();
+  const { data: workerItems, isLoading: isWorkerLoading } = useWorkers();
   const createWareItem = useCreateWareItem();
   const updateWareItem = useUpdateWareItem();
   const deleteWareItem = useDeleteWareItem();
@@ -98,41 +100,88 @@ export default function WareItemPage() {
     <div className="custom-container space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold tracking-tight text-gray-900">Омбор Махсулотлари</h1>
-        <Sheet open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
-          <SheetTrigger asChild>
-            <button className="flex items-center gap-2 px-3 py-1.5 bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg transition-colors text-sm">
-              <Plus className="w-4 h-4" />
-              <span>Qo'shish</span>
-            </button>
-          </SheetTrigger>
-          <SheetContent>
-            <SheetHeader>
-              <SheetTitle>Янги махсулот қўшиш</SheetTitle>
-            </SheetHeader>
-            <div className="space-y-4 mt-4">
-              <div>
-                <label className="text-sm font-medium text-gray-700 mb-1 block">Махсулот номи</label>
+        <div className="flex items-center gap-3 cursor-pointer">
+          <Sheet>
+            <SheetTrigger asChild>
+              <button className="flex items-center gap-2 px-3 cursor-pointer py-1.5 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors text-sm">Chiqarish</button>
+            </SheetTrigger>
+            <SheetContent>
+              <SheetHeader>
+                <SheetTitle>Чиқарish</SheetTitle>
+              </SheetHeader>
+              <div className="space-y-4 mt-4">
+                <label className="text-sm font-medium text-gray-700 mb-1 block" htmlFor="reason">Maxsulot</label>
+                <select
+                  name="wareTransaction"
+                  id="wareTransaction"
+                  className="w-full h-8 rounded-lg border border-input bg-transparent px-2.5 py-1 text-sm transition-colors outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+                >
+                  {Array.isArray(wareItems) && wareItems.map(item => (
+                    <option key={item._id} value={item._id}>{item.name}</option>
+                  ))}
+                </select>
+                <label className="text-sm font-medium text-gray-700 mb-1 block" htmlFor="quantity">Миқдор</label>
                 <Input
-                  value={newWareItem.name}
-                  onChange={(e) => setNewWareItem({ ...newWareItem, name: e.target.value })}
-                  placeholder="Махсулот номини киритинг"
-                />
-              </div>
-              <div>
-                <label className="text-sm font-medium text-gray-700 mb-1 block">Миқдор</label>
-                <Input
+                  id="quantity"
                   value={newWareItem.quantity.toString()}
                   onChange={(e) => setNewWareItem({ ...newWareItem, quantity: Number(e.target.value) })}
                   placeholder="Миқдорни киритинг"
                   type="number"
                 />
+
+                <label className="text-sm font-medium text-gray-700 mb-1 block" htmlFor="reason">Berildi</label>
+                <select
+                  name="wareTransaction"
+                  id="wareTransaction"
+                  className="w-full h-8 rounded-lg border border-input bg-transparent px-2.5 py-1 text-sm transition-colors outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+                >
+                  {Array.isArray(workerItems) && workerItems.map(item => (
+                    <option key={item._id} value={item._id}>{item.name}</option>
+                  ))}
+                </select>
+                <Button className="flex items-center gap-2 px-3 py-1.5 bg-black/80 hover:bg-black text-white rounded-lg transition-colors text-sm w-full">
+                  <Check className="w-4 h-4" />
+                  <span>Сақлаш</span>
+                </Button>
               </div>
-              <Button onClick={handleAddWareItem} className="w-full">
-                Қўшиш
-              </Button>
-            </div>
-          </SheetContent>
-        </Sheet>
+            </SheetContent>
+          </Sheet>
+          <Sheet open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
+            <SheetTrigger asChild>
+              <button className="flex items-center gap-2 px-3 py-1.5 bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg transition-colors text-sm">
+                <Plus className="w-4 h-4" />
+                <span>Qo'shish</span>
+              </button>
+            </SheetTrigger>
+            <SheetContent>
+              <SheetHeader>
+                <SheetTitle>Янги махсулот қўшиш</SheetTitle>
+              </SheetHeader>
+              <div className="space-y-4 mt-4">
+                <div>
+                  <label className="text-sm font-medium text-gray-700 mb-1 block">Махсулот номи</label>
+                  <Input
+                    value={newWareItem.name}
+                    onChange={(e) => setNewWareItem({ ...newWareItem, name: e.target.value })}
+                    placeholder="Махсулот номини киритинг"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-gray-700 mb-1 block">Миқдор</label>
+                  <Input
+                    value={newWareItem.quantity.toString()}
+                    onChange={(e) => setNewWareItem({ ...newWareItem, quantity: Number(e.target.value) })}
+                    placeholder="Миқдорни киритинг"
+                    type="number"
+                  />
+                </div>
+                <Button onClick={handleAddWareItem} className="w-full">
+                  Қўшиш
+                </Button>
+              </div>
+            </SheetContent>
+          </Sheet>
+        </div>
 
         {/* Edit Ware item Modal */}
         <Sheet open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
