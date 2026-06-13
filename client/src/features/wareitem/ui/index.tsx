@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Package, MoreVertical, Plus, AlertTriangle, Check, ArrowDownUp } from "lucide-react";
 import { useWareItems, useCreateWareItem, useUpdateWareItem, useDeleteWareItem } from "@/shared/lib/hooks/use-ware-items";
 import { useWareTransactions, useCreateWareTransaction } from "@/shared/lib/hooks/use-ware-transactions";
@@ -21,10 +21,28 @@ import { useWorkers } from "@/shared/lib/hooks/use-workers";
 import { useTranslations } from "next-intl";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/shared/ui/chart";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Legend, Cell } from "recharts";
+import { useAuth } from "@/shared/lib/hooks/use-auth";
+import { useRouter } from "next/navigation";
 
 export default function WareItemPage() {
   const t = useTranslations("WareItems");
   const tCommon = useTranslations("Common");
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!authLoading && !isAuthenticated) {
+      router.push("/login");
+    }
+  }, [isAuthenticated, authLoading, router]);
+
+  if (authLoading) {
+    return null;
+  }
+
+  if (!isAuthenticated) {
+    return null;
+  }
 
   const { data: wareItems, isLoading } = useWareItems();
   const { data: wareTransactions, isLoading: isTransactionsLoading } = useWareTransactions();

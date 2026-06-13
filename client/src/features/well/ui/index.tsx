@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { MoreVertical, Plus } from "lucide-react";
 import { useWells, useCreateWell, useUpdateWell, useDeleteWell } from "@/shared/lib/hooks/use-wells";
 import { useTeams } from "@/shared/lib/hooks/use-teams";
@@ -20,10 +20,28 @@ import { Input } from "@/shared/ui/input";
 import { useTranslations } from "next-intl";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/shared/ui/chart";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Legend } from "recharts";
+import { useAuth } from "@/shared/lib/hooks/use-auth";
+import { useRouter } from "next/navigation";
 
 export default function WellPage() {
   const t = useTranslations("Wells");
   const tCommon = useTranslations("Common");
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!authLoading && !isAuthenticated) {
+      router.push("/login");
+    }
+  }, [isAuthenticated, authLoading, router]);
+
+  if (authLoading) {
+    return null;
+  }
+
+  if (!isAuthenticated) {
+    return null;
+  }
 
   const { data: wells, isLoading } = useWells();
   const { data: teams } = useTeams();

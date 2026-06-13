@@ -5,16 +5,34 @@ import { useCreatePurchase, useDeletePurchase, usePurchases, useUpdatePurchase }
 import { SkeletonCard } from "@/shared/ui/SkeletonCard";
 import { EmptyState } from "@/shared/ui/EmptyState";
 import { CreatePurchaseDto, Purchase } from "@/shared/config/api/purchase.model";
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/shared/ui/sheet";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/shared/ui/dropdown-menu";
 import { useTranslations } from "next-intl";
+import { useAuth } from "@/shared/lib/hooks/use-auth";
+import { useRouter } from "next/navigation";
 
 export default function PurchasePage() {
   const t = useTranslations("Purchases");
   const tCommon = useTranslations("Common");
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!authLoading && !isAuthenticated) {
+      router.push("/login");
+    }
+  }, [isAuthenticated, authLoading, router]);
+
+  if (authLoading) {
+    return null;
+  }
+
+  if (!isAuthenticated) {
+    return null;
+  }
 
   const { data: purchases, isLoading } = usePurchases();
   const createPurchase = useCreatePurchase();

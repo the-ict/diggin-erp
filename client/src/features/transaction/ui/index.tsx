@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { MoreVertical, Plus, DollarSign } from "lucide-react";
 import {
   useCreateTransaction,
@@ -28,10 +28,28 @@ import { Button } from "@/shared/ui/button";
 import { useTranslations } from "next-intl";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/shared/ui/chart";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Legend } from "recharts";
+import { useAuth } from "@/shared/lib/hooks/use-auth";
+import { useRouter } from "next/navigation";
 
 export default function TransactionPage() {
   const t = useTranslations("Transactions");
   const tCommon = useTranslations("Common");
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!authLoading && !isAuthenticated) {
+      router.push("/login");
+    }
+  }, [isAuthenticated, authLoading, router]);
+
+  if (authLoading) {
+    return null;
+  }
+
+  if (!isAuthenticated) {
+    return null;
+  }
 
   const { data: transactions, isLoading } = useTransactions();
   const createTransaction = useCreateTransaction();

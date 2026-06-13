@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Users, Truck, MoreVertical, Plus } from "lucide-react";
 import { useTeams, useCreateTeam, useUpdateTeam, useDeleteTeam } from "@/shared/lib/hooks/use-teams";
 import { useWorkers } from "@/shared/lib/hooks/use-workers";
@@ -20,11 +20,29 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/sh
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
 import { useTranslations } from "next-intl";
+import { useAuth } from "@/shared/lib/hooks/use-auth";
+import { useRouter } from "next/navigation";
 
 export default function TeamPage() {
   const t = useTranslations("Teams");
   const tCommon = useTranslations("Common");
   const tWorkers = useTranslations("Workers");
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!authLoading && !isAuthenticated) {
+      router.push("/login");
+    }
+  }, [isAuthenticated, authLoading, router]);
+
+  if (authLoading) {
+    return null;
+  }
+
+  if (!isAuthenticated) {
+    return null;
+  }
 
   const { data: teams, isLoading: teamsLoading } = useTeams();
   const { data: workers } = useWorkers();

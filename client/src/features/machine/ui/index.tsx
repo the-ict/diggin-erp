@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Truck, MoreVertical, Plus, AlertCircle } from "lucide-react";
 import { useMachines, useCreateMachine, useUpdateMachine, useDeleteMachine } from "@/shared/lib/hooks/use-machines";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/shared/ui/dropdown-menu";
@@ -13,10 +13,28 @@ import { EmptyState } from "@/shared/ui/EmptyState";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
 import { useTranslations } from "next-intl";
+import { useAuth } from "@/shared/lib/hooks/use-auth";
+import { useRouter } from "next/navigation";
 
 export default function MachinePage() {
   const t = useTranslations("Machines");
   const tCommon = useTranslations("Common");
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!authLoading && !isAuthenticated) {
+      router.push("/login");
+    }
+  }, [isAuthenticated, authLoading, router]);
+
+  if (authLoading) {
+    return null;
+  }
+
+  if (!isAuthenticated) {
+    return null;
+  }
 
   const { data: machines, isLoading } = useMachines();
   const { data: teams } = useTeams();
