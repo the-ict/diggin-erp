@@ -31,7 +31,8 @@ const Navbar = () => {
     return item.roles.includes(user.role);
   });
 
-  if(pathname.includes("login")) return;
+  // Hide navbar if user has only one accessible page or is on login page
+  if (pathname.includes("login") || filteredMenu.length <= 1) return null;
 
   return (
     <section className="py-4 bg-white">

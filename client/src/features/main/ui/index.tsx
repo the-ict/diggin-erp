@@ -49,6 +49,21 @@ export default function MainPage() {
     }
   }, [isAuthenticated, isLoading, router]);
 
+  // Redirect non-admin users to their appropriate page
+  useEffect(() => {
+    if (!isLoading && isAuthenticated && user && user.role !== "ADMIN") {
+      const roleRedirects: Record<string, string> = {
+        MANAGER: "/dashboard/purchase",
+        WORKER: "/dashboard/well",
+        WAREHOUSEMAN: "/dashboard/wareitem",
+      };
+      const redirectPath = roleRedirects[user.role];
+      if (redirectPath) {
+        router.push(redirectPath);
+      }
+    }
+  }, [isLoading, isAuthenticated, user, router]);
+
   if (isLoading) {
     return null;
   }
@@ -57,10 +72,12 @@ export default function MainPage() {
     return null;
   }
 
-  // Filter wells by team for WORKER role
-  const filteredWells = user?.role === "WORKER" && user.teamId
-    ? wells?.filter((well) => well.team === user.teamId)
-    : wells;
+  // Only show admin dashboard to ADMIN users
+  if (user?.role !== "ADMIN") {
+    return null;
+  }
+
+  const filteredWells = wells;
 
   const currentMonth = new Date().getMonth();
   const currentYear = new Date().getFullYear();

@@ -3,7 +3,7 @@ import { MenuItem } from './model';
 import { LanguageRoutes } from '@/shared/config/i18n/types';
 
 const menu: MenuItem[] = [
-  { title: 'Navbar.dashboard', url: '/dashboard', icon: LayoutGrid, roles: ['ADMIN', 'WORKER'] },
+  { title: 'Navbar.dashboard', url: '/dashboard', icon: LayoutGrid, roles: ['ADMIN'] },
   { title: 'Navbar.worker', url: '/dashboard/worker', icon: Users, roles: ['ADMIN'] },
   { title: 'Navbar.team', url: '/dashboard/team', icon: User, roles: ['ADMIN'] },
   { title: 'Navbar.machine', url: '/dashboard/machine', icon: Truck, roles: ['ADMIN'] },
