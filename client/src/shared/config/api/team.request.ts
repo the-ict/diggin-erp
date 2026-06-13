@@ -1,18 +1,28 @@
 import { URLS } from "./URLs";
 import { Team, CreateTeamDto, UpdateTeamDto } from "./team.model";
 
-const headers = { "Content-Type": "application/json" };
+const getHeaders = () => {
+  const token = localStorage.getItem("token");
+  return {
+    "Content-Type": "application/json",
+    ...(token && { Authorization: `Bearer ${token}` }),
+  };
+};
 
 export const teamRequests = {
   getAll: async (): Promise<Team[]> => {
-    const res = await fetch(URLS.teams);
+    const res = await fetch(URLS.teams, {
+      headers: getHeaders(),
+    });
     if (!res.ok) throw new Error("Failed to fetch teams");
     const json = await res.json();
     return json.data || [];
   },
 
   getOne: async (id: string): Promise<Team> => {
-    const res = await fetch(URLS.team(id));
+    const res = await fetch(URLS.team(id), {
+      headers: getHeaders(),
+    });
     if (!res.ok) throw new Error("Failed to fetch team");
     return res.json();
   },
@@ -20,7 +30,7 @@ export const teamRequests = {
   create: async (data: CreateTeamDto): Promise<Team> => {
     const res = await fetch(URLS.teams, {
       method: "POST",
-      headers,
+      headers: getHeaders(),
       body: JSON.stringify(data),
     });
     if (!res.ok) throw new Error("Failed to create team");
@@ -30,7 +40,7 @@ export const teamRequests = {
   update: async (id: string, data: UpdateTeamDto): Promise<Team> => {
     const res = await fetch(URLS.team(id), {
       method: "PUT",
-      headers,
+      headers: getHeaders(),
       body: JSON.stringify(data),
     });
     if (!res.ok) throw new Error("Failed to update team");
@@ -38,7 +48,10 @@ export const teamRequests = {
   },
 
   delete: async (id: string): Promise<void> => {
-    const res = await fetch(URLS.team(id), { method: "DELETE" });
+    const res = await fetch(URLS.team(id), {
+      method: "DELETE",
+      headers: getHeaders(),
+    });
     if (!res.ok) throw new Error("Failed to delete team");
   },
 };

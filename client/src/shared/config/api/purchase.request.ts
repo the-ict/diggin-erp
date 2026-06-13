@@ -1,20 +1,30 @@
 import { URLS } from "./URLs";
 import { Purchase, CreatePurchaseDto, UpdatePurchaseDto } from "./purchase.model";
 
-const headers = { "Content-Type": "application/json" };
+const getHeaders = () => {
+  const token = localStorage.getItem("token");
+  return {
+    "Content-Type": "application/json",
+    ...(token && { Authorization: `Bearer ${token}` }),
+  };
+};
 
 export const purchaseRequests = {
   getAll: async (): Promise<{
     success: boolean;
     data: Purchase[];
   }> => {
-    const res = await fetch(URLS.purchases);
+    const res = await fetch(URLS.purchases, {
+      headers: getHeaders(),
+    });
     if (!res.ok) throw new Error("Failed to fetch purchases");
     return res.json();
   },
 
   getOne: async (id: string): Promise<Purchase> => {
-    const res = await fetch(URLS.purchase(id));
+    const res = await fetch(URLS.purchase(id), {
+      headers: getHeaders(),
+    });
     if (!res.ok) throw new Error("Failed to fetch purchase");
     return res.json();
   },
@@ -22,7 +32,7 @@ export const purchaseRequests = {
   create: async (data: CreatePurchaseDto): Promise<Purchase> => {
     const res = await fetch(URLS.purchases, {
       method: "POST",
-      headers,
+      headers: getHeaders(),
       body: JSON.stringify(data),
     });
     if (!res.ok) throw new Error("Failed to create purchase");
@@ -32,7 +42,7 @@ export const purchaseRequests = {
   update: async (id: string, data: UpdatePurchaseDto): Promise<Purchase> => {
     const res = await fetch(URLS.purchase(id), {
       method: "PUT",
-      headers,
+      headers: getHeaders(),
       body: JSON.stringify(data),
     });
     if (!res.ok) throw new Error("Failed to update purchase");
@@ -40,7 +50,10 @@ export const purchaseRequests = {
   },
 
   delete: async (id: string): Promise<void> => {
-    const res = await fetch(URLS.purchase(id), { method: "DELETE" });
+    const res = await fetch(URLS.purchase(id), {
+      method: "DELETE",
+      headers: getHeaders(),
+    });
     if (!res.ok) throw new Error("Failed to delete purchase");
   },
 };

@@ -181,7 +181,7 @@ export default function WareItemPage() {
   return (
     <div className="custom-container space-y-8">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold tracking-tight text-gray-900">{t("title")}</h1>
+        <h1 className="text-2xl max-lg:text-[20px] font-semibold tracking-tight text-gray-900">{t("title")}</h1>
         <div className="flex items-center gap-3">
           <Sheet open={isTransactionSheetOpen} onOpenChange={handleTransactionSheetChange}>
             <SheetTrigger asChild>

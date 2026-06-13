@@ -1,18 +1,28 @@
 import { URLS } from "./URLs";
 import { Well, CreateWellDto, UpdateWellDto } from "./well.model";
 
-const headers = { "Content-Type": "application/json" };
+const getHeaders = () => {
+  const token = localStorage.getItem("token");
+  return {
+    "Content-Type": "application/json",
+    ...(token && { Authorization: `Bearer ${token}` }),
+  };
+};
 
 export const wellRequests = {
   getAll: async (): Promise<Well[]> => {
-    const res = await fetch(URLS.wells);
+    const res = await fetch(URLS.wells, {
+      headers: getHeaders(),
+    });
     if (!res.ok) throw new Error("Failed to fetch wells");
     const json = await res.json();
     return json.data || [];
   },
 
   getOne: async (id: string): Promise<Well> => {
-    const res = await fetch(URLS.well(id));
+    const res = await fetch(URLS.well(id), {
+      headers: getHeaders(),
+    });
     if (!res.ok) throw new Error("Failed to fetch well");
     return res.json();
   },
@@ -20,7 +30,7 @@ export const wellRequests = {
   create: async (data: CreateWellDto): Promise<Well> => {
     const res = await fetch(URLS.wells, {
       method: "POST",
-      headers,
+      headers: getHeaders(),
       body: JSON.stringify(data),
     });
     if (!res.ok) throw new Error("Failed to create well");
@@ -30,7 +40,7 @@ export const wellRequests = {
   update: async (id: string, data: UpdateWellDto): Promise<Well> => {
     const res = await fetch(URLS.well(id), {
       method: "PUT",
-      headers,
+      headers: getHeaders(),
       body: JSON.stringify(data),
     });
     if (!res.ok) throw new Error("Failed to update well");
@@ -38,7 +48,10 @@ export const wellRequests = {
   },
 
   delete: async (id: string): Promise<void> => {
-    const res = await fetch(URLS.well(id), { method: "DELETE" });
+    const res = await fetch(URLS.well(id), {
+      method: "DELETE",
+      headers: getHeaders(),
+    });
     if (!res.ok) throw new Error("Failed to delete well");
   },
 };
