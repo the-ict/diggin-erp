@@ -1,5 +1,7 @@
 import WorkerPage from "@/features/worker/ui";
 
 export default function page() {
-  return <WorkerPage />;
+  return <div className="py-10">
+    <WorkerPage />
+  </div>;
 }

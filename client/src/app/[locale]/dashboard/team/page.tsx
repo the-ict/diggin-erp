@@ -1,5 +1,7 @@
 import TeamPage from "@/features/team/ui";
 
 export default function page() {
-  return <TeamPage />;
+  return <div className="py-10">
+    <TeamPage />
+  </div>;
 }

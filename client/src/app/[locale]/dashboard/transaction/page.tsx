@@ -1,5 +1,7 @@
 import TransactionPage from "@/features/transaction/ui";
 
 export default function Component() {
-  return <TransactionPage />;
+  return <div className="py-10">
+    <TransactionPage />
+  </div>;
 }

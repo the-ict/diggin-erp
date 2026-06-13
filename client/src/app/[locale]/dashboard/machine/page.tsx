@@ -1,5 +1,7 @@
 import MachinePage from "@/features/machine/ui";
 
 export default function page() {
-  return <MachinePage />;
+  return <div className="py-10">
+    <MachinePage />
+  </div>;
 }

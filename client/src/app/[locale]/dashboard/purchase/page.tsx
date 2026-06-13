@@ -1,5 +1,7 @@
 import PurchasePage from "@/features/purchase/ui";
 
 export default function page() {
-  return <PurchasePage />;
+  return <div className="py-10">
+    <PurchasePage />
+  </div>;
 }
