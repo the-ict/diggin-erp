@@ -22,6 +22,19 @@ export default function MachinePage() {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const router = useRouter();
 
+  // Call ALL hooks before any early returns
+  const { data: machines, isLoading } = useMachines();
+  const { data: teams } = useTeams();
+  const createMachine = useCreateMachine();
+  const updateMachine = useUpdateMachine();
+  const deleteMachine = useDeleteMachine();
+
+  const [filterStatus, setFilterStatus] = useState<string>("ALL");
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [newMachine, setNewMachine] = useState({ number: "", status: "ACTIVE" as MachineStatus, teamId: "", wells: [] as string[] });
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editingMachine, setEditingMachine] = useState<Machine | null>(null);
+
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
       router.push("/login");
@@ -35,18 +48,6 @@ export default function MachinePage() {
   if (!isAuthenticated) {
     return null;
   }
-
-  const { data: machines, isLoading } = useMachines();
-  const { data: teams } = useTeams();
-  const createMachine = useCreateMachine();
-  const updateMachine = useUpdateMachine();
-  const deleteMachine = useDeleteMachine();
-
-  const [filterStatus, setFilterStatus] = useState<string>("ALL");
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [newMachine, setNewMachine] = useState({ number: "", status: "ACTIVE" as MachineStatus, teamId: "", wells: [] as string[] });
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [editingMachine, setEditingMachine] = useState<Machine | null>(null);
 
   const filteredMachines = Array.isArray(machines) ? machines.filter(machine =>
     filterStatus === "ALL" || machine.status === filterStatus

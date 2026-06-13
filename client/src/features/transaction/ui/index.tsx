@@ -37,20 +37,7 @@ export default function TransactionPage() {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const router = useRouter();
 
-  useEffect(() => {
-    if (!authLoading && !isAuthenticated) {
-      router.push("/login");
-    }
-  }, [isAuthenticated, authLoading, router]);
-
-  if (authLoading) {
-    return null;
-  }
-
-  if (!isAuthenticated) {
-    return null;
-  }
-
+  // Call ALL hooks before any early returns
   const { data: transactions, isLoading } = useTransactions();
   const createTransaction = useCreateTransaction();
   const updateTransaction = useUpdateTransaction();
@@ -66,6 +53,50 @@ export default function TransactionPage() {
     note: "",
   });
   const [filterType, setFilterType] = useState<string>("ALL");
+
+  // Group transactions by date for flow chart
+  const flowChartData = useMemo(() => {
+    if (!Array.isArray(transactions)) return [];
+    const groups: Record<string, { date: string; income: number; outcome: number }> = {};
+
+    transactions.forEach((t) => {
+      const dateStr = new Date(t.createdAt).toLocaleDateString("uz-UZ", {
+        day: "2-digit",
+        month: "2-digit",
+      });
+      if (!groups[dateStr]) {
+        groups[dateStr] = { date: dateStr, income: 0, outcome: 0 };
+      }
+      if (t.type === "INCOME") {
+        groups[dateStr].income += t.amount;
+      } else {
+        groups[dateStr].outcome += t.amount;
+      }
+    });
+
+    return Object.values(groups)
+      .sort((a, b) => {
+        const [dayA, monthA] = a.date.split(".").map(Number);
+        const [dayB, monthB] = b.date.split(".").map(Number);
+        if (monthA !== monthB) return monthA - monthB;
+        return dayA - dayB;
+      })
+      .slice(-15); // Show last 15 active days
+  }, [transactions]);
+
+  useEffect(() => {
+    if (!authLoading && !isAuthenticated) {
+      router.push("/login");
+    }
+  }, [isAuthenticated, authLoading, router]);
+
+  if (authLoading) {
+    return null;
+  }
+
+  if (!isAuthenticated) {
+    return null;
+  }
 
   const filteredTransactions = transactions?.filter(
     (transaction) => filterType === "ALL" || transaction.type === filterType
@@ -122,36 +153,6 @@ export default function TransactionPage() {
       console.log("failed to add transaction: ", error);
     }
   };
-
-  // Group transactions by date for flow chart
-  const flowChartData = useMemo(() => {
-    if (!Array.isArray(transactions)) return [];
-    const groups: Record<string, { date: string; income: number; outcome: number }> = {};
-
-    transactions.forEach((t) => {
-      const dateStr = new Date(t.createdAt).toLocaleDateString("uz-UZ", {
-        day: "2-digit",
-        month: "2-digit",
-      });
-      if (!groups[dateStr]) {
-        groups[dateStr] = { date: dateStr, income: 0, outcome: 0 };
-      }
-      if (t.type === "INCOME") {
-        groups[dateStr].income += t.amount;
-      } else {
-        groups[dateStr].outcome += t.amount;
-      }
-    });
-
-    return Object.values(groups)
-      .sort((a, b) => {
-        const [dayA, monthA] = a.date.split(".").map(Number);
-        const [dayB, monthB] = b.date.split(".").map(Number);
-        if (monthA !== monthB) return monthA - monthB;
-        return dayA - dayB;
-      })
-      .slice(-15); // Show last 15 active days
-  }, [transactions]);
 
   if (isLoading) {
     return (

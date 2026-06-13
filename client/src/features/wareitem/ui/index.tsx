@@ -30,20 +30,7 @@ export default function WareItemPage() {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const router = useRouter();
 
-  useEffect(() => {
-    if (!authLoading && !isAuthenticated) {
-      router.push("/login");
-    }
-  }, [isAuthenticated, authLoading, router]);
-
-  if (authLoading) {
-    return null;
-  }
-
-  if (!isAuthenticated) {
-    return null;
-  }
-
+  // Call ALL hooks before any early returns
   const { data: wareItems, isLoading } = useWareItems();
   const { data: wareTransactions, isLoading: isTransactionsLoading } = useWareTransactions();
   const { data: workerItems } = useWorkers();
@@ -64,6 +51,29 @@ export default function WareItemPage() {
     givenToWorker: "",
     wareItemId: "",
   });
+
+  // Construct stock chart data
+  const stockChartData = useMemo(() => {
+    if (!Array.isArray(wareItems)) return [];
+    return wareItems.map((item) => ({
+      name: item.name,
+      quantity: item.quantity,
+    }));
+  }, [wareItems]);
+
+  useEffect(() => {
+    if (!authLoading && !isAuthenticated) {
+      router.push("/login");
+    }
+  }, [isAuthenticated, authLoading, router]);
+
+  if (authLoading) {
+    return null;
+  }
+
+  if (!isAuthenticated) {
+    return null;
+  }
 
   const MINIMUM_QUANTITY = 10;
   const stockOptions = ["ALL", "LOW", "NORMAL"] as const;
@@ -145,15 +155,6 @@ export default function WareItemPage() {
       console.error("Failed to add ware transaction:", error);
     }
   };
-
-  // Construct stock chart data
-  const stockChartData = useMemo(() => {
-    if (!Array.isArray(wareItems)) return [];
-    return wareItems.map((item) => ({
-      name: item.name,
-      quantity: item.quantity,
-    }));
-  }, [wareItems]);
 
   if (isLoading) {
     return (

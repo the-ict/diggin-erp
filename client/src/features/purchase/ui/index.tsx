@@ -20,20 +20,7 @@ export default function PurchasePage() {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const router = useRouter();
 
-  useEffect(() => {
-    if (!authLoading && !isAuthenticated) {
-      router.push("/login");
-    }
-  }, [isAuthenticated, authLoading, router]);
-
-  if (authLoading) {
-    return null;
-  }
-
-  if (!isAuthenticated) {
-    return null;
-  }
-
+  // Call ALL hooks before any early returns
   const { data: purchases, isLoading } = usePurchases();
   const createPurchase = useCreatePurchase();
   const updatePurchase = useUpdatePurchase();
@@ -51,6 +38,20 @@ export default function PurchasePage() {
   });
 
   const totalCost: number = useMemo(() => Array.isArray(purchases?.data) && purchases.data.reduce((sum, p) => sum + (p.quantity * p.price), 0) || 0, [purchases]);
+
+  useEffect(() => {
+    if (!authLoading && !isAuthenticated) {
+      router.push("/login");
+    }
+  }, [isAuthenticated, authLoading, router]);
+
+  if (authLoading) {
+    return null;
+  }
+
+  if (!isAuthenticated) {
+    return null;
+  }
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('uz-UZ').format(amount);

@@ -30,6 +30,19 @@ export default function TeamPage() {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const router = useRouter();
 
+  // Call ALL hooks before any early returns
+  const { data: teams, isLoading: teamsLoading } = useTeams();
+  const { data: workers } = useWorkers();
+  const { data: machines } = useMachines();
+  const createTeam = useCreateTeam();
+  const updateTeam = useUpdateTeam();
+  const deleteTeam = useDeleteTeam();
+
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editingTeam, setEditingTeam] = useState<Team | null>(null);
+  const [newTeam, setNewTeam] = useState({ name: "", workersIds: [] as string[], machine: "", wells: [] as string[] });
+
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
       router.push("/login");
@@ -43,18 +56,6 @@ export default function TeamPage() {
   if (!isAuthenticated) {
     return null;
   }
-
-  const { data: teams, isLoading: teamsLoading } = useTeams();
-  const { data: workers } = useWorkers();
-  const { data: machines } = useMachines();
-  const createTeam = useCreateTeam();
-  const updateTeam = useUpdateTeam();
-  const deleteTeam = useDeleteTeam();
-
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [editingTeam, setEditingTeam] = useState<Team | null>(null);
-  const [newTeam, setNewTeam] = useState({ name: "", workersIds: [] as string[], machine: "", wells: [] as string[] });
 
   const handleAddTeam = async () => {
     try {

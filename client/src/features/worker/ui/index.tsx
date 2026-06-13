@@ -26,6 +26,19 @@ export default function WorkerPage() {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const router = useRouter();
 
+  // Call ALL hooks before any early returns
+  const { data: workers, isLoading } = useWorkers();
+  const { data: teams } = useTeams();
+  const createWorker = useCreateWorker();
+  const updateWorker = useUpdateWorker();
+  const deleteWorker = useDeleteWorker();
+
+  const [filterPosition, setFilterPosition] = useState<string>("ALL");
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editingWorker, setEditingWorker] = useState<Worker | null>(null);
+  const [newWorker, setNewWorker] = useState({ name: "", phone: "", position: "WORKER" as WorkerPosition, teamId: "" });
+
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
       router.push("/login");
@@ -39,18 +52,6 @@ export default function WorkerPage() {
   if (!isAuthenticated) {
     return null;
   }
-
-  const { data: workers, isLoading } = useWorkers();
-  const { data: teams } = useTeams();
-  const createWorker = useCreateWorker();
-  const updateWorker = useUpdateWorker();
-  const deleteWorker = useDeleteWorker();
-
-  const [filterPosition, setFilterPosition] = useState<string>("ALL");
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [editingWorker, setEditingWorker] = useState<Worker | null>(null);
-  const [newWorker, setNewWorker] = useState({ name: "", phone: "", position: "WORKER" as WorkerPosition, teamId: "" });
 
   const filteredWorkers = Array.isArray(workers) ? workers.filter(worker => 
     filterPosition === "ALL" || worker.position === filterPosition

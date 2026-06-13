@@ -29,6 +29,32 @@ export default function WellPage() {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const router = useRouter();
 
+  // Call ALL hooks before any early returns
+  const { data: wells, isLoading } = useWells();
+  const { data: teams } = useTeams();
+  const createWell = useCreateWell();
+  const updateWell = useUpdateWell();
+  const deleteWell = useDeleteWell();
+
+  const [filterStatus, setFilterStatus] = useState<string>("ALL");
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editingWell, setEditingWell] = useState<Well | null>(null);
+  const [newWell, setNewWell] = useState({ team: "", length: 0, except_length: 0, status: "DUGGING" as WellStatus });
+
+  // Construct chart data comparing expected vs actual depth
+  const wellChartData = useMemo(() => {
+    if (!Array.isArray(wells)) return [];
+    return wells.map((well) => {
+      const team = Array.isArray(teams) ? teams.find((t) => t._id === well.team) : undefined;
+      return {
+        name: team?.name ?? well.team,
+        expected: well.except_length,
+        actual: well.length,
+      };
+    });
+  }, [wells, teams]);
+
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
       router.push("/login");
@@ -42,18 +68,6 @@ export default function WellPage() {
   if (!isAuthenticated) {
     return null;
   }
-
-  const { data: wells, isLoading } = useWells();
-  const { data: teams } = useTeams();
-  const createWell = useCreateWell();
-  const updateWell = useUpdateWell();
-  const deleteWell = useDeleteWell();
-
-  const [filterStatus, setFilterStatus] = useState<string>("ALL");
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [editingWell, setEditingWell] = useState<Well | null>(null);
-  const [newWell, setNewWell] = useState({ team: "", length: 0, except_length: 0, status: "DUGGING" as WellStatus });
 
   const filteredWells = Array.isArray(wells)
     ? wells.filter((well) => filterStatus === "ALL" || well.status === filterStatus)
@@ -104,19 +118,6 @@ export default function WellPage() {
       console.error("Failed to delete well:", error);
     }
   };
-
-  // Construct chart data comparing expected vs actual depth
-  const wellChartData = useMemo(() => {
-    if (!Array.isArray(wells)) return [];
-    return wells.map((well) => {
-      const team = Array.isArray(teams) ? teams.find((t) => t._id === well.team) : undefined;
-      return {
-        name: team?.name ?? well.team,
-        expected: well.except_length,
-        actual: well.length,
-      };
-    });
-  }, [wells, teams]);
 
   if (isLoading) {
     return (
@@ -312,7 +313,7 @@ export default function WellPage() {
       )}
 
       {/* Status Filter */}
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 overflow-x-auto">
         {statuses.map((status) => (
           <button
             key={status}
