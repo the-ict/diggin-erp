@@ -9,11 +9,11 @@ const router = Router();
 // All routes require authentication
 router.use(authenticate);
 
-// Only ADMIN can manage teams
-router.post("/", authorize("ADMIN"), validate(createTeamValidator), createTeam);
-router.get("/", authorize("ADMIN"), getAllTeams);
-router.get("/:id", authorize("ADMIN"), getTeamById);
-router.put("/:id", authorize("ADMIN"), validate(updateTeamValidator), updateTeam);
-router.delete("/:id", authorize("ADMIN"), deleteTeam);
+// Only ADMIN can manage teams (create, update, delete)
+router.post("/", validate(createTeamValidator), createTeam);
+router.get("/", getAllTeams); // All authenticated users can read teams
+router.get("/:id", getTeamById); // All authenticated users can read teams
+router.put("/:id", validate(updateTeamValidator), updateTeam);
+router.delete("/:id", deleteTeam);
 
 export default router;

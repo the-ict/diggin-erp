@@ -5,7 +5,7 @@ export interface AuthRequest extends Request {
     userId?: string;
     username?: string;
     role?: string;
-    teamId?: string | undefined;
+    team?: string | undefined;
 }
 
 export const authenticate = (req: AuthRequest, res: Response, next: NextFunction) => {
@@ -18,11 +18,14 @@ export const authenticate = (req: AuthRequest, res: Response, next: NextFunction
         const token = authHeader.substring(7);
         const decoded = verifyToken(token) as JWTPayload;
 
+        console.log("decoded: ", decoded);
+
         req.userId = decoded.userId;
         req.username = decoded.username;
         req.role = decoded.role;
-        req.teamId = decoded.teamId;
+        req.team = decoded.teamId;
 
+        console.log("Authenticated user:", req.userId, req.username, req.role, req.team);
         next();
     } catch (error) {
         return res.status(401).json({ success: false, error: "Invalid token" });
@@ -44,9 +47,9 @@ export const authorize = (...allowedRoles: string[]) => {
 };
 
 export const authorizeOwnTeam = (req: AuthRequest, res: Response, next: NextFunction) => {
-    if (!req.role || !req.teamId) {
+    if (!req.role || !req.body.team) {
         return res.status(401).json({ success: false, error: "Not authenticated" });
-    }
+    };
 
     if (req.role !== "ADMIN" && req.role !== "WORKER") {
         return res.status(403).json({ success: false, error: "Not authorized" });

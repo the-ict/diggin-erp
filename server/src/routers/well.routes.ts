@@ -17,9 +17,9 @@ router.get("/", getAllWells);
 router.get("/:id", getWellById);
 
 // WORKER can update wells for their own team, ADMIN can update all
-router.put("/:id", authorizeOwnTeam, validate(updateWellValidator), updateWell);
+router.put("/:id", authenticate,authorizeOwnTeam, validate(updateWellValidator), updateWell);
 
 // Only ADMIN can delete wells
-router.delete("/:id", authorize("ADMIN"), deleteWell);
+router.delete("/:id", authorize("ADMIN", "WORKER"), deleteWell);
 
 export default router;

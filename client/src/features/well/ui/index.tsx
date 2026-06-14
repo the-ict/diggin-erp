@@ -26,7 +26,7 @@ import { useRouter } from "next/navigation";
 export default function WellPage() {
   const t = useTranslations("Wells");
   const tCommon = useTranslations("Common");
-  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const { isAuthenticated, isLoading: authLoading, user } = useAuth();
   const router = useRouter();
 
   // Call ALL hooks before any early returns
@@ -42,10 +42,19 @@ export default function WellPage() {
   const [editingWell, setEditingWell] = useState<Well | null>(null);
   const [newWell, setNewWell] = useState({ team: "", length: 0, except_length: 0, status: "DUGGING" as WellStatus });
 
-  // Construct chart data comparing expected vs actual depth
   const wellChartData = useMemo(() => {
-    if (!Array.isArray(wells)) return [];
-    return wells.map((well) => {
+    const roleFilteredWells = Array.isArray(wells)
+      ? wells.filter((well) => {
+          if (user?.role === "ADMIN") return true;
+          if (user?.role === "WORKER" && user.teamId) {
+            return well.team === user.teamId;
+          }
+          return true;
+        })
+      : [];
+
+    if (!Array.isArray(roleFilteredWells)) return [];
+    return roleFilteredWells.map((well) => {
       const team = Array.isArray(teams) ? teams.find((t) => t._id === well.team) : undefined;
       return {
         name: team?.name ?? well.team,
@@ -53,7 +62,7 @@ export default function WellPage() {
         actual: well.length,
       };
     });
-  }, [wells, teams]);
+  }, [wells, teams, user]);
 
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
@@ -69,11 +78,33 @@ export default function WellPage() {
     return null;
   }
 
-  const filteredWells = Array.isArray(wells)
-    ? wells.filter((well) => filterStatus === "ALL" || well.status === filterStatus)
+  const roleFilteredWells = Array.isArray(wells)
+    ? wells.filter((well) => {
+        if (user?.role === "ADMIN") return true;
+        if (user?.role === "WORKER" && user.teamId) {
+          return well.team === user.teamId;
+        }
+        return true;
+      })
     : [];
 
+  const filteredWells = roleFilteredWells.filter(
+    (well) => filterStatus === "ALL" || well.status === filterStatus
+  );
+
   const statuses: (WellStatus | "ALL")[] = ["ALL", "DUGGING", "FINISHED", "SUCCESSFUL", "FAILED"];
+
+  const canEditWell = (well: Well): boolean => {
+    if (user?.role === "ADMIN") return true;
+    if (user?.role === "WORKER" && user.teamId) {
+      return well.team === user.teamId;
+    }
+    return true;
+  };
+
+  const canAddWell = (): boolean => {
+    return user?.role === "ADMIN" || user?.role === "WORKER";
+  };
 
   const handleAddWell = async () => {
     try {
@@ -99,7 +130,7 @@ export default function WellPage() {
   const handleUpdateWell = async () => {
     if (!editingWell) return;
     try {
-      await updateWell.mutateAsync({ id: editingWell._id, data: newWell });
+      await updateWell.mutateAsync({ id: editingWell._id, data: { ...newWell, team: editingWell.team } });
       setIsEditModalOpen(false);
       setEditingWell(null);
       setNewWell({ team: "", length: 0, except_length: 0, status: "DUGGING" });
@@ -111,7 +142,7 @@ export default function WellPage() {
   const handleDeleteWell = async (well: Well) => {
     const team = Array.isArray(teams) ? teams.find((t) => t._id === well.team) : undefined;
     const teamName = team?.name ?? well.team;
-    if (!confirm(tCommon("confirmDelete"))) return;
+    if (!confirm(tCommon("confirmDelete") + ` ${teamName}?`)) return;
     try {
       await deleteWell.mutateAsync(well._id);
     } catch (error) {
@@ -149,14 +180,15 @@ export default function WellPage() {
     <div className="custom-container space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold tracking-tight text-gray-900">{t("title")}</h1>
-        <Sheet open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
-          <SheetTrigger asChild>
-            <button className="flex items-center gap-2 px-3 py-1.5 bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg transition-colors text-sm">
-              <Plus className="w-4 h-4" />
-              <span>{tCommon("add")}</span>
-            </button>
-          </SheetTrigger>
-          <SheetContent>
+        {canAddWell() && (
+          <Sheet open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
+            <SheetTrigger asChild>
+              <button className="flex items-center gap-2 px-3 py-1.5 bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg transition-colors text-sm">
+                <Plus className="w-4 h-4" />
+                <span>{tCommon("add")}</span>
+              </button>
+            </SheetTrigger>
+            <SheetContent>
             <SheetHeader>
               <SheetTitle>{t("addTitle")}</SheetTitle>
             </SheetHeader>
@@ -209,6 +241,7 @@ export default function WellPage() {
             </div>
           </SheetContent>
         </Sheet>
+        )}
 
         {/* Edit Well Modal */}
         <Sheet open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
@@ -356,24 +389,26 @@ export default function WellPage() {
                       <StatusBadge status={well.status} />
                     </td>
                     <td className="py-3.5 text-right px-6">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <button className="text-gray-400 hover:text-gray-600 transition-colors">
-                            <MoreVertical className="w-5 h-5" />
-                          </button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent>
-                          <DropdownMenuItem onClick={() => handleEditWell(well)}>
-                            {tCommon("edit")}
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            className="text-red-600"
-                            onClick={() => handleDeleteWell(well)}
-                          >
-                            {tCommon("delete")}
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                      {canEditWell(well) && (
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <button className="text-gray-400 hover:text-gray-600 transition-colors">
+                              <MoreVertical className="w-5 h-5" />
+                            </button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent>
+                            <DropdownMenuItem onClick={() => handleEditWell(well)}>
+                              {tCommon("edit")}
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              className="text-red-600"
+                              onClick={() => handleDeleteWell(well)}
+                            >
+                              {tCommon("delete")}
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      )}
                     </td>
                   </tr>
                 );

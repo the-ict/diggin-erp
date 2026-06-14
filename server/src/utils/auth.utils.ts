@@ -2,7 +2,7 @@ import jwt from "jsonwebtoken";
 import type { IUser } from "../types/user.types.js";
 
 const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key-change-in-production";
-const JWT_EXPIRES_IN = "7d";
+const JWT_EXPIRES_IN = "15d";
 
 export interface JWTPayload {
     userId: string;
