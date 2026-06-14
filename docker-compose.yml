@@ -1,0 +1,32 @@
+name: dribbling
+
+services:
+  server:
+    build: ./server
+    ports:
+      - "5656:5656"
+    environment:
+      - NODE_ENV=production
+    restart: unless-stopped
+    env_file:
+      - ./server/.env
+  mongodb:
+    image: mongo:latest
+    container_name: dribbling-mongodb
+    restart: unless-stopped
+    ports:
+      - "27018:27018"
+    volumes:
+      - mongodb_data:/data/db
+    environment:
+      MONGO_INITDB_DATABASE: dribbling
+    networks:
+      - dribbling-network
+
+networks:
+  dribbling-network:
+    driver: bridge
+
+volumes:
+  mongodb_data:
+    driver: local
