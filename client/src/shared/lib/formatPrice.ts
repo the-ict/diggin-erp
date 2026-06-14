@@ -10,9 +10,7 @@ import { getLocale } from 'next-intl/server';
 const formatPrice = async (amount: number | string, withLabel?: boolean) => {
   const locale = (await getLocale()) as LanguageRoutes;
   const label = withLabel
-    ? locale == LanguageRoutes.RU
-      ? ' сум'
-      : locale == LanguageRoutes.KI
+    ? locale == LanguageRoutes.KI
         ? ' сўм'
         : ' so‘m'
     : '';
