@@ -1,4 +1,4 @@
-const BASE_URL = "http://localhost:3000/api";
+const BASE_URL = "https://digging.davlatbek.uz/api";
 
 export const userRequests = {
   login: async (username: string, password: string) => {
