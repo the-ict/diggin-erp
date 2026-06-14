@@ -59,7 +59,7 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
 });
 
 // start server
-app.listen(3000, async () => {
+app.listen(5656, async () => {
     await connection_db();
     logger.info("Server is running on port 3000");
 });
